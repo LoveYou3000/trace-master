@@ -1,16 +1,18 @@
 package com.zhang.trace.master.server.socket;
 
+import com.zhang.trace.master.core.config.socket.response.domain.BaseResponse;
+import com.zhang.trace.master.server.socket.response.AgentResponse;
+import com.zhang.trace.master.server.utils.JacksonUtil;
+import lombok.SneakyThrows;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.web.socket.TextMessage;
 import org.springframework.web.socket.WebSocketSession;
 
 import java.io.IOException;
-import java.util.ArrayList;
-import java.util.Collections;
+import java.util.Collection;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
-import java.util.concurrent.CopyOnWriteArrayList;
 
 /**
  * websocket 会话的管理以及消息的发送
@@ -24,17 +26,18 @@ public class WebSocketSessionManager {
     /**
      * 保存 appId 以及对应的所有会话
      */
-    private static final Map<String, List<WebSocketSession>> SESSION_HOLDER = new ConcurrentHashMap<>();
+    private static final Map<String, Map<String, WebSocketSession>> SESSION_HOLDER = new ConcurrentHashMap<>();
 
     /**
      * 保存 appId 以及对应的会话
      *
-     * @param appId   需要监听的 appId
-     * @param session 会话信息
+     * @param appId      需要监听的 appId
+     * @param instanceId 实例id
+     * @param session    会话信息
      */
-    public static void saveSession(String appId, WebSocketSession session) {
-        List<WebSocketSession> sessions = SESSION_HOLDER.getOrDefault(appId, new CopyOnWriteArrayList<>());
-        sessions.add(session);
+    public static void saveSession(String appId, String instanceId, WebSocketSession session) {
+        Map<String, WebSocketSession> sessions = SESSION_HOLDER.getOrDefault(appId, new ConcurrentHashMap<>());
+        sessions.put(instanceId, session);
         SESSION_HOLDER.put(appId, sessions);
     }
 
@@ -45,18 +48,20 @@ public class WebSocketSessionManager {
      * @return appId 对应的会话
      */
     public static List<WebSocketSession> getSessions(String appId) {
-        return Collections.unmodifiableList(SESSION_HOLDER.getOrDefault(appId, new ArrayList<>()));
+        Collection<WebSocketSession> sessions = SESSION_HOLDER.getOrDefault(appId, new ConcurrentHashMap<>()).values();
+        return List.copyOf(sessions);
     }
 
     /**
      * 移除 appId 以及对应的会话
      *
-     * @param appId   需要监听的 appId
-     * @param session 会话信息
+     * @param appId      需要监听的 appId
+     * @param instanceId 实例id
      */
-    public static void removeSession(String appId, WebSocketSession session) {
-        List<WebSocketSession> sessions = SESSION_HOLDER.getOrDefault(appId, new CopyOnWriteArrayList<>());
-        sessions.remove(session);
+    @SneakyThrows(IOException.class)
+    public static void removeSession(String appId, String instanceId) {
+        Map<String, WebSocketSession> sessions = SESSION_HOLDER.getOrDefault(appId, new ConcurrentHashMap<>());
+        sessions.remove(instanceId).close();
         SESSION_HOLDER.put(appId, sessions);
     }
 
@@ -68,9 +73,7 @@ public class WebSocketSessionManager {
      */
     public static void broadcastMessage(String appId, String message) {
         TextMessage textMessage = new TextMessage(message);
-        getSessions(appId).forEach(session -> {
-            sendMessage(session, textMessage);
-        });
+        getSessions(appId).forEach(session -> sendMessage(session, textMessage));
     }
 
     /**
@@ -80,6 +83,49 @@ public class WebSocketSessionManager {
      */
     public static void broadcastMessage(String message) {
         SESSION_HOLDER.forEach((appId, sessions) -> broadcastMessage(appId, message));
+    }
+
+    /**
+     * 向某个会话发送消息
+     *
+     * @param appId           appId
+     * @param instanceId      实例id
+     * @param responseMessage 要发送的消息实体类
+     */
+    public static void sendMessage(String appId, String instanceId, BaseResponse responseMessage) {
+        sendMessage(SESSION_HOLDER.getOrDefault(appId, new ConcurrentHashMap<>()).get(instanceId), responseMessage);
+    }
+
+    /**
+     * 向某个会话发送消息
+     *
+     * @param appId      appId
+     * @param instanceId 实例id
+     * @param message    要发送的消息
+     */
+    public static void sendMessage(String appId, String instanceId, String message) {
+        sendMessage(SESSION_HOLDER.getOrDefault(appId, new ConcurrentHashMap<>()).get(instanceId), message);
+    }
+
+    /**
+     * 向某个会话发送消息
+     *
+     * @param appId      appId
+     * @param instanceId 实例id
+     * @param message    要发送的消息
+     */
+    public static void sendMessage(String appId, String instanceId, TextMessage message) {
+        sendMessage(SESSION_HOLDER.getOrDefault(appId, new ConcurrentHashMap<>()).get(instanceId), message);
+    }
+
+    /**
+     * 向某个会话发送消息
+     *
+     * @param session         会话
+     * @param responseMessage 要发送的消息实体类
+     */
+    public static void sendMessage(WebSocketSession session, BaseResponse responseMessage) {
+        sendMessage(session, JacksonUtil.toJsonString(new AgentResponse<>(responseMessage)));
     }
 
     /**
@@ -98,13 +144,9 @@ public class WebSocketSessionManager {
      * @param session 会话
      * @param message 要发送的消息
      */
+    @SneakyThrows(IOException.class)
     public static void sendMessage(WebSocketSession session, TextMessage message) {
-        try {
-            session.sendMessage(message);
-        } catch (IOException e) {
-            log.error("发送 socket 消息失败", e);
-            throw new RuntimeException(e);
-        }
+        session.sendMessage(message);
     }
 
 }

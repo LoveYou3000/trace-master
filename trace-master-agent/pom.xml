@@ -19,6 +19,12 @@
 
     <dependencies>
         <dependency>
+            <groupId>org.java-websocket</groupId>
+            <artifactId>Java-WebSocket</artifactId>
+            <version>1.5.7</version>
+        </dependency>
+
+        <dependency>
             <groupId>com.zhang</groupId>
             <artifactId>trace-master-core</artifactId>
         </dependency>

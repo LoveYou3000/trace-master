@@ -1,41 +1,40 @@
-package com.zhang.trace.master.server.socket.message;
+package com.zhang.trace.master.server.socket.request;
 
 import com.fasterxml.jackson.core.JacksonException;
 import com.fasterxml.jackson.core.JsonParser;
 import com.fasterxml.jackson.databind.DeserializationContext;
 import com.fasterxml.jackson.databind.JsonDeserializer;
 import com.fasterxml.jackson.databind.JsonNode;
-import com.fasterxml.jackson.databind.ObjectMapper;
+import com.zhang.trace.master.core.config.socket.request.domain.BaseRequest;
+import com.zhang.trace.master.server.utils.JacksonUtil;
 
 import java.io.IOException;
 
 /**
- * AgentMessage 的反序列
+ * AgentRequest 的反序列
  *
  * @author zhang
  * @date 2024-10-18 10:20
  */
-public class AgentMessageDeserializer extends JsonDeserializer<AgentMessage<?>> {
-
-    private final ObjectMapper objectMapper = new ObjectMapper();
+public class AgentRequestDeserializer extends JsonDeserializer<AgentRequest<?>> {
 
     @Override
-    public AgentMessage<?> deserialize(JsonParser jp, DeserializationContext deserializationContext) throws IOException, JacksonException {
+    public AgentRequest<?> deserialize(JsonParser jp, DeserializationContext deserializationContext) throws IOException, JacksonException {
         JsonNode node = jp.getCodec().readTree(jp);
 
         // 获取 type 字段并解析为 MessageType
         String typeValue = node.get("type").asText();
-        AgentMessageType messageType = AgentMessageType.valueOf(typeValue.toUpperCase());
+        AgentRequestType messageType = AgentRequestType.valueOf(typeValue.toUpperCase());
 
         // 获取 data 字段并根据 type 的 paramKlz 转换
         JsonNode dataNode = node.get("data");
-        Class<?> paramKlz = messageType.getParamKlz();
+        Class<? extends BaseRequest> paramKlz = messageType.getRequestKlz();
 
         // 使用 ObjectMapper 将 data 反序列化为相应的类型
-        Object data = objectMapper.treeToValue(dataNode, paramKlz);
+        BaseRequest data = JacksonUtil.parseTreeNodeObj(dataNode, paramKlz);
 
         // 创建并返回 Message 对象
-        AgentMessage<Object> message = new AgentMessage<>();
+        AgentRequest<BaseRequest> message = new AgentRequest<>();
         message.setData(data);
         message.setType(messageType);
 
