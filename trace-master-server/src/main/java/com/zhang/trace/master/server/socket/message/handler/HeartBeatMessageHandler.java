@@ -1,7 +1,7 @@
 package com.zhang.trace.master.server.socket.message.handler;
 
-import com.zhang.trace.master.server.socket.domain.AgentMessage;
 import com.zhang.trace.master.server.socket.WebSocketSessionManager;
+import com.zhang.trace.master.server.socket.message.domain.HeartBeatMessage;
 import org.springframework.web.socket.WebSocketSession;
 
 import java.util.Objects;
@@ -12,17 +12,19 @@ import java.util.Objects;
  * @author zhang
  * @date 2024-10-16 17:22
  */
-public class HeartBeatMessageHandler implements AgentMessageHandler {
+public class HeartBeatMessageHandler implements AgentMessageHandler<HeartBeatMessage> {
 
     private static final String PING = "ping";
 
     private static final String PONG = "pong";
 
     @Override
-    public void handleAgentMessage(AgentMessage agentMessage, WebSocketSession session) {
-        if (Objects.equals(PING, agentMessage.getMsg())) {
-            WebSocketSessionManager.sendMessage(session, PONG);
+    public void handle(HeartBeatMessage data, WebSocketSession session) {
+        if (!Objects.equals(PING, data.getPing())) {
+            throw new RuntimeException("wrong heartbeat data:" + data.getPing());
         }
+        WebSocketSessionManager.sendMessage(session, PONG);
+        // TODO 心跳保活
     }
 
 }

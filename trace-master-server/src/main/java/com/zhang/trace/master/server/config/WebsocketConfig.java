@@ -24,7 +24,7 @@ public class WebsocketConfig implements WebSocketConfigurer {
 
     @Override
     public void registerWebSocketHandlers(@NonNull WebSocketHandlerRegistry registry) {
-        registry.addHandler(new TraceMasterServerWebSocketHandler(), "/")
+        registry.addHandler(new TraceMasterServerWebSocketHandler(), "/socket")
                 .setAllowedOrigins("*");
     }
 

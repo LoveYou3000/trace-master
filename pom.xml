@@ -42,6 +42,12 @@
                 <artifactId>trace-master-core</artifactId>
                 <version>${trace-master.version}</version>
             </dependency>
+
+            <dependency>
+                <groupId>com.zhang</groupId>
+                <artifactId>trace-master-agent</artifactId>
+                <version>${trace-master.version}</version>
+            </dependency>
         </dependencies>
     </dependencyManagement>
 

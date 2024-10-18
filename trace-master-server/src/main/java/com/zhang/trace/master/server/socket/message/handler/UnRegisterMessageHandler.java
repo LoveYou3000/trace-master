@@ -1,6 +1,6 @@
 package com.zhang.trace.master.server.socket.message.handler;
 
-import com.zhang.trace.master.server.socket.domain.AgentMessage;
+import com.zhang.trace.master.server.socket.message.domain.UnRegistryMessage;
 import org.springframework.web.socket.WebSocketSession;
 
 /**
@@ -9,10 +9,10 @@ import org.springframework.web.socket.WebSocketSession;
  * @author zhang
  * @date 2024-10-16 17:24
  */
-public class UnRegisterMessageHandler implements AgentMessageHandler {
+public class UnRegisterMessageHandler implements AgentMessageHandler<UnRegistryMessage> {
 
     @Override
-    public void handleAgentMessage(AgentMessage agentMessage, WebSocketSession session) {
+    public void handle(UnRegistryMessage data, WebSocketSession session) {
         // TODO 反注册消息处理
     }
 

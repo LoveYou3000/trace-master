@@ -8,6 +8,6 @@ package com.zhang.trace.master.core.config;
  */
 public class TraceMasterAgentConfig {
 
-    
+
 
 }
