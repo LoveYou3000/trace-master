@@ -1,9 +1,12 @@
 package com.zhang.trace.master.server.socket.handler.impl;
 
+import com.zhang.trace.master.core.config.socket.request.ServerRequest;
+import com.zhang.trace.master.core.config.socket.request.ServerRequestType;
+import com.zhang.trace.master.core.config.socket.request.domain.HeartBeatRequest;
+import com.zhang.trace.master.core.config.socket.request.domain.HeartBeatResultRequest;
 import com.zhang.trace.master.server.socket.WebSocketSessionManager;
 import com.zhang.trace.master.server.socket.handler.AgentRequestHandler;
-import com.zhang.trace.master.core.config.socket.request.domain.HeartBeatRequest;
-import com.zhang.trace.master.core.config.socket.response.domain.HeartBeatResponse;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.web.socket.WebSocketSession;
 
 import java.util.Objects;
@@ -14,6 +17,7 @@ import java.util.Objects;
  * @author zhang
  * @date 2024-10-16 17:22
  */
+@Slf4j
 public class HeartBeatRequestHandler implements AgentRequestHandler<HeartBeatRequest> {
 
     private static final String PING = "ping";
@@ -22,12 +26,18 @@ public class HeartBeatRequestHandler implements AgentRequestHandler<HeartBeatReq
 
     @Override
     public void handle(HeartBeatRequest heartBeatRequest, WebSocketSession session) {
+        log.info("收到心跳请求:" + heartBeatRequest);
         if (!Objects.equals(PING, heartBeatRequest.getPing())) {
             throw new RuntimeException("wrong heartbeat data:" + heartBeatRequest.getPing());
         }
-        HeartBeatResponse heartBeatResponse = new HeartBeatResponse();
+        HeartBeatResultRequest heartBeatResponse = new HeartBeatResultRequest();
         heartBeatResponse.setPong(PONG);
-        WebSocketSessionManager.sendMessage(heartBeatRequest.getAppId(), heartBeatRequest.getInstanceId(), heartBeatResponse);
+
+        ServerRequest<HeartBeatResultRequest> serverRequest = new ServerRequest<>();
+        serverRequest.setData(heartBeatResponse);
+        serverRequest.setType(ServerRequestType.HEARTBEAT_RESULT);
+
+        WebSocketSessionManager.sendMessage(heartBeatRequest.getAppId(), heartBeatRequest.getInstanceId(), serverRequest);
     }
 
 }

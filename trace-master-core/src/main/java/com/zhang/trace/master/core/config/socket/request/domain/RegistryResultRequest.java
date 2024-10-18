@@ -4,13 +4,12 @@ import lombok.Data;
 import lombok.EqualsAndHashCode;
 
 /**
- * 收到的拉取配置消息
+ * 收到的注册结果消息
  *
  * @author zhang
- * @date 2024-10-18 09:52
+ * @date 2024-10-18 16:55
  */
 @Data
 @EqualsAndHashCode(callSuper = true)
-public class FetchConfigRequest extends BaseRequest {
-
+public class RegistryResultRequest extends BaseRequest {
 }

@@ -13,9 +13,4 @@ import lombok.EqualsAndHashCode;
 @EqualsAndHashCode(callSuper = true)
 public class UnRegistryRequest extends BaseRequest {
 
-    /**
-     * 实例id
-     */
-    private String instanceId;
-
 }

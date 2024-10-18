@@ -1,4 +1,4 @@
-package com.zhang.trace.master.server.socket.request;
+package com.zhang.trace.master.core.config.socket.request;
 
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import com.zhang.trace.master.core.config.socket.request.domain.BaseRequest;

@@ -2,6 +2,7 @@ package com.zhang.trace.master.agent.socket.handler.impl;
 
 import com.zhang.trace.master.agent.socket.handler.ServerRequestHandler;
 import com.zhang.trace.master.core.config.socket.request.domain.ConfigUpdatedRequest;
+import com.zhang.trace.master.core.config.socket.request.domain.FetchConfigRequest;
 import org.java_websocket.client.WebSocketClient;
 
 /**
@@ -14,7 +15,10 @@ public class ConfigUpdatedRequestHandler implements ServerRequestHandler<ConfigU
 
     @Override
     public void handle(ConfigUpdatedRequest data, WebSocketClient session) {
-
+        FetchConfigRequest fetchConfigRequest = new FetchConfigRequest();
+        // TODO 添加 appId 以及 instanceId
+        fetchConfigRequest.setAppId("");
+        fetchConfigRequest.setInstanceId("");
     }
 
 }

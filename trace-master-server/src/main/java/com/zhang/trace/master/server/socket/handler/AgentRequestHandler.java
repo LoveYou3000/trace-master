@@ -1,5 +1,10 @@
 package com.zhang.trace.master.server.socket.handler;
 
+import com.zhang.trace.master.core.config.socket.request.AgentRequestType;
+import com.zhang.trace.master.server.socket.handler.impl.FetchConfigRequestHandler;
+import com.zhang.trace.master.server.socket.handler.impl.HeartBeatRequestHandler;
+import com.zhang.trace.master.server.socket.handler.impl.RegisterRequestHandler;
+import com.zhang.trace.master.server.socket.handler.impl.UnRegisterRequestHandler;
 import org.springframework.web.socket.WebSocketSession;
 
 /**
@@ -19,6 +24,32 @@ public interface AgentRequestHandler<T> {
     @SuppressWarnings("unchecked")
     default void handleMessage(Object data, WebSocketSession session) {
         handle((T) data, session);
+    }
+
+    /**
+     * 获取消息类型对应的消息处理器
+     *
+     * @param agentRequestType 消息类型
+     * @return 消息处理器
+     */
+    static AgentRequestHandler<?> getAgentRequestHandler(AgentRequestType agentRequestType) {
+        switch (agentRequestType) {
+            case HEARTBEAT -> {
+                return new HeartBeatRequestHandler();
+            }
+            case REGISTER -> {
+                return new RegisterRequestHandler();
+            }
+            case UNREGISTER -> {
+                return new UnRegisterRequestHandler();
+            }
+            case FETCH_CONFIG -> {
+                return new FetchConfigRequestHandler();
+            }
+            default -> {
+                throw new RuntimeException("未适配的请求类型:" + agentRequestType);
+            }
+        }
     }
 
     /**

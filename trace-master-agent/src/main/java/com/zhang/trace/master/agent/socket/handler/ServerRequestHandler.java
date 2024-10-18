@@ -1,5 +1,8 @@
 package com.zhang.trace.master.agent.socket.handler;
 
+import com.zhang.trace.master.agent.socket.handler.impl.ConfigUpdatedRequestHandler;
+import com.zhang.trace.master.agent.socket.handler.impl.RegistryResultRequestHandler;
+import com.zhang.trace.master.core.config.socket.request.ServerRequestType;
 import org.java_websocket.client.WebSocketClient;
 
 /**
@@ -19,6 +22,26 @@ public interface ServerRequestHandler<T> {
     @SuppressWarnings("unchecked")
     default void handleMessage(Object data, WebSocketClient session) {
         handle((T) data, session);
+    }
+
+    /**
+     * 获取消息类型对应的消息处理器
+     *
+     * @param serverRequestType 消息类型
+     * @return 消息处理器
+     */
+    static ServerRequestHandler<?> getServerRequestHandler(ServerRequestType serverRequestType) {
+        switch (serverRequestType) {
+            case REGISTRY_RESULT -> {
+                return new RegistryResultRequestHandler();
+            }
+            case CONFIG_UPDATED -> {
+                return new ConfigUpdatedRequestHandler();
+            }
+            default -> {
+                throw new RuntimeException("未适配的请求类型:" + serverRequestType);
+            }
+        }
     }
 
     /**

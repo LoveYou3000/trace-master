@@ -4,13 +4,15 @@ import lombok.Data;
 import lombok.EqualsAndHashCode;
 
 /**
- * 收到的拉取配置消息
+ * 响应的心跳消息
  *
  * @author zhang
- * @date 2024-10-18 09:52
+ * @date 2024-10-18 17:05
  */
 @Data
 @EqualsAndHashCode(callSuper = true)
-public class FetchConfigRequest extends BaseRequest {
+public class HeartBeatResultRequest extends BaseRequest {
+
+    private String pong;
 
 }

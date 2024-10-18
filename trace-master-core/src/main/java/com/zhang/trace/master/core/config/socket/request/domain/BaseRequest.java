@@ -13,4 +13,6 @@ public class BaseRequest {
 
     private String appId;
 
+    private String instanceId;
+
 }

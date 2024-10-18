@@ -1,8 +1,9 @@
 package com.zhang.trace.master.server.socket;
 
-import com.zhang.trace.master.core.config.socket.response.domain.BaseResponse;
-import com.zhang.trace.master.server.socket.response.AgentResponse;
-import com.zhang.trace.master.server.utils.JacksonUtil;
+import com.zhang.trace.master.core.config.socket.request.AgentRequest;
+import com.zhang.trace.master.core.config.socket.request.ServerRequest;
+import com.zhang.trace.master.core.config.socket.request.domain.BaseRequest;
+import com.zhang.trace.master.core.config.util.JacksonUtil;
 import lombok.SneakyThrows;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.web.socket.TextMessage;
@@ -93,10 +94,10 @@ public class WebSocketSessionManager {
      *
      * @param appId           appId
      * @param instanceId      实例id
-     * @param responseMessage 要发送的消息实体类
+     * @param serverRequest 要发送的消息实体类
      */
-    public static void sendMessage(String appId, String instanceId, BaseResponse responseMessage) {
-        sendMessage(SESSION_HOLDER.getOrDefault(appId, new ConcurrentHashMap<>(MAP_INIT_SIZE)).get(instanceId), responseMessage);
+    public static void sendMessage(String appId, String instanceId, ServerRequest<? extends BaseRequest> serverRequest) {
+        sendMessage(SESSION_HOLDER.getOrDefault(appId, new ConcurrentHashMap<>(MAP_INIT_SIZE)).get(instanceId), serverRequest);
     }
 
     /**
@@ -125,10 +126,10 @@ public class WebSocketSessionManager {
      * 向某个会话发送消息
      *
      * @param session         会话
-     * @param responseMessage 要发送的消息实体类
+     * @param serverRequest 要发送的消息实体类
      */
-    public static void sendMessage(WebSocketSession session, BaseResponse responseMessage) {
-        sendMessage(session, JacksonUtil.toJsonString(new AgentResponse<>(responseMessage)));
+    public static void sendMessage(WebSocketSession session, ServerRequest<? extends BaseRequest> serverRequest) {
+        sendMessage(session, JacksonUtil.toJsonString(serverRequest));
     }
 
     /**

@@ -1,11 +1,6 @@
-package com.zhang.trace.master.server.socket.request;
+package com.zhang.trace.master.core.config.socket.request;
 
 import com.zhang.trace.master.core.config.socket.request.domain.BaseRequest;
-import com.zhang.trace.master.server.socket.handler.AgentRequestHandler;
-import com.zhang.trace.master.server.socket.handler.impl.FetchConfigRequestHandler;
-import com.zhang.trace.master.server.socket.handler.impl.HeartBeatRequestHandler;
-import com.zhang.trace.master.server.socket.handler.impl.RegisterRequestHandler;
-import com.zhang.trace.master.server.socket.handler.impl.UnRegisterRequestHandler;
 import com.zhang.trace.master.core.config.socket.request.domain.FetchConfigRequest;
 import com.zhang.trace.master.core.config.socket.request.domain.HeartBeatRequest;
 import com.zhang.trace.master.core.config.socket.request.domain.RegistryRequest;
@@ -26,28 +21,23 @@ public enum AgentRequestType {
     /**
      * 心跳
      */
-    HEARTBEAT(new HeartBeatRequestHandler(), HeartBeatRequest.class),
+    HEARTBEAT(HeartBeatRequest.class),
 
     /**
      * 注册
      */
-    REGISTER(new RegisterRequestHandler(), RegistryRequest.class),
+    REGISTER(RegistryRequest.class),
 
     /**
      * 反注册
      */
-    UNREGISTER(new UnRegisterRequestHandler(), UnRegistryRequest.class),
+    UNREGISTER(UnRegistryRequest.class),
 
     /**
      * 拉取配置信息
      */
-    FETCH_CONFIG(new FetchConfigRequestHandler(), FetchConfigRequest.class),
+    FETCH_CONFIG(FetchConfigRequest.class),
     ;
-
-    /**
-     * 对应的消息处理器
-     */
-    private final AgentRequestHandler<?> handler;
 
     /**
      * 消息内实体类的类型

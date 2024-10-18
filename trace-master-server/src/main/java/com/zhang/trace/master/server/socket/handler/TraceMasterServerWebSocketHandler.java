@@ -1,7 +1,10 @@
 package com.zhang.trace.master.server.socket.handler;
 
-import com.zhang.trace.master.server.socket.request.AgentRequest;
-import com.zhang.trace.master.server.utils.JacksonUtil;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.module.SimpleModule;
+import com.zhang.trace.master.core.config.socket.request.AgentRequest;
+import com.zhang.trace.master.core.config.socket.request.AgentRequestDeserializer;
+import com.zhang.trace.master.core.config.util.JacksonUtil;
 import jakarta.annotation.Nonnull;
 import org.springframework.web.socket.TextMessage;
 import org.springframework.web.socket.WebSocketSession;
@@ -17,8 +20,7 @@ public class TraceMasterServerWebSocketHandler extends TextWebSocketHandler {
 
     @Override
     protected void handleTextMessage(@Nonnull WebSocketSession session, TextMessage message) throws Exception {
-        String payload = message.getPayload();
-        AgentRequest<?> agentRequest = JacksonUtil.parseObj(payload, AgentRequest.class);
-        agentRequest.getType().getHandler().handleMessage(agentRequest.getData(), session);
+        AgentRequest<?> agentRequest = JacksonUtil.parseObj(message.getPayload(), AgentRequest.class);
+        AgentRequestHandler.getAgentRequestHandler(agentRequest.getType()).handleMessage(agentRequest.getData(), session);
     }
 }

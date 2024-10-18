@@ -1,12 +1,10 @@
-package com.zhang.trace.master.server.utils;
+package com.zhang.trace.master.core.config.util;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.core.TreeNode;
 import com.fasterxml.jackson.databind.JsonMappingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.SneakyThrows;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Component;
 
 /**
  * jackson 工具类
@@ -14,22 +12,16 @@ import org.springframework.stereotype.Component;
  * @author zhang
  * @date 2024-10-18 14:15
  */
-@Component
 public class JacksonUtil {
 
-    private static ObjectMapper OBJECT_MAPPER;
-
-    @Autowired
-    public void setObjectMapper(ObjectMapper objectMapper) {
-        JacksonUtil.OBJECT_MAPPER = objectMapper;
-    }
+    private static final ObjectMapper OBJECT_MAPPER = new ObjectMapper();
 
     @SneakyThrows(JsonProcessingException.class)
     public static String toJsonString(Object obj) {
         return OBJECT_MAPPER.writeValueAsString(obj);
     }
 
-    @SneakyThrows({JsonProcessingException.class, JsonMappingException.class})
+    @SneakyThrows({JsonProcessingException.class})
     public static <T> T parseObj(String json, Class<T> klz) {
         return OBJECT_MAPPER.readValue(json, klz);
     }

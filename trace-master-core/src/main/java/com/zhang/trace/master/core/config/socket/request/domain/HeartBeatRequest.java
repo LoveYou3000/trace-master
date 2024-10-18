@@ -14,11 +14,6 @@ import lombok.EqualsAndHashCode;
 public class HeartBeatRequest extends BaseRequest {
 
     /**
-     * 实例id
-     */
-    private String instanceId;
-
-    /**
      * 心跳
      */
     private String ping;
