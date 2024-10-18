@@ -23,10 +23,13 @@ import java.util.concurrent.ConcurrentHashMap;
 @Slf4j
 public class WebSocketSessionManager {
 
+    private static final int MAP_INIT_SIZE = 16;
+
     /**
      * 保存 appId 以及对应的所有会话
      */
-    private static final Map<String, Map<String, WebSocketSession>> SESSION_HOLDER = new ConcurrentHashMap<>();
+    private static final Map<String, Map<String, WebSocketSession>> SESSION_HOLDER = new ConcurrentHashMap<>(MAP_INIT_SIZE);
+
 
     /**
      * 保存 appId 以及对应的会话
@@ -36,7 +39,7 @@ public class WebSocketSessionManager {
      * @param session    会话信息
      */
     public static void saveSession(String appId, String instanceId, WebSocketSession session) {
-        Map<String, WebSocketSession> sessions = SESSION_HOLDER.getOrDefault(appId, new ConcurrentHashMap<>());
+        Map<String, WebSocketSession> sessions = SESSION_HOLDER.getOrDefault(appId, new ConcurrentHashMap<>(MAP_INIT_SIZE));
         sessions.put(instanceId, session);
         SESSION_HOLDER.put(appId, sessions);
     }
@@ -48,7 +51,7 @@ public class WebSocketSessionManager {
      * @return appId 对应的会话
      */
     public static List<WebSocketSession> getSessions(String appId) {
-        Collection<WebSocketSession> sessions = SESSION_HOLDER.getOrDefault(appId, new ConcurrentHashMap<>()).values();
+        Collection<WebSocketSession> sessions = SESSION_HOLDER.getOrDefault(appId, new ConcurrentHashMap<>(MAP_INIT_SIZE)).values();
         return List.copyOf(sessions);
     }
 
@@ -60,7 +63,7 @@ public class WebSocketSessionManager {
      */
     @SneakyThrows(IOException.class)
     public static void removeSession(String appId, String instanceId) {
-        Map<String, WebSocketSession> sessions = SESSION_HOLDER.getOrDefault(appId, new ConcurrentHashMap<>());
+        Map<String, WebSocketSession> sessions = SESSION_HOLDER.getOrDefault(appId, new ConcurrentHashMap<>(MAP_INIT_SIZE));
         sessions.remove(instanceId).close();
         SESSION_HOLDER.put(appId, sessions);
     }
@@ -93,7 +96,7 @@ public class WebSocketSessionManager {
      * @param responseMessage 要发送的消息实体类
      */
     public static void sendMessage(String appId, String instanceId, BaseResponse responseMessage) {
-        sendMessage(SESSION_HOLDER.getOrDefault(appId, new ConcurrentHashMap<>()).get(instanceId), responseMessage);
+        sendMessage(SESSION_HOLDER.getOrDefault(appId, new ConcurrentHashMap<>(MAP_INIT_SIZE)).get(instanceId), responseMessage);
     }
 
     /**
@@ -104,7 +107,7 @@ public class WebSocketSessionManager {
      * @param message    要发送的消息
      */
     public static void sendMessage(String appId, String instanceId, String message) {
-        sendMessage(SESSION_HOLDER.getOrDefault(appId, new ConcurrentHashMap<>()).get(instanceId), message);
+        sendMessage(SESSION_HOLDER.getOrDefault(appId, new ConcurrentHashMap<>(MAP_INIT_SIZE)).get(instanceId), message);
     }
 
     /**
@@ -115,7 +118,7 @@ public class WebSocketSessionManager {
      * @param message    要发送的消息
      */
     public static void sendMessage(String appId, String instanceId, TextMessage message) {
-        sendMessage(SESSION_HOLDER.getOrDefault(appId, new ConcurrentHashMap<>()).get(instanceId), message);
+        sendMessage(SESSION_HOLDER.getOrDefault(appId, new ConcurrentHashMap<>(MAP_INIT_SIZE)).get(instanceId), message);
     }
 
     /**
