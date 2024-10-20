@@ -1,7 +1,7 @@
 package com.zhang.trace.master.core.config.socket.request;
 
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
-import com.zhang.trace.master.core.config.socket.request.domain.BaseRequest;
+import com.zhang.trace.master.core.config.socket.request.domain.BaseSocketMessage;
 import lombok.Data;
 
 /**
@@ -11,11 +11,11 @@ import lombok.Data;
  * @date 2024-10-16 17:18
  */
 @Data
-@JsonDeserialize(using = ServerRequestDeserializer.class)
-public class ServerRequest<T extends BaseRequest> {
+@JsonDeserialize(using = ServerMessageDeserializer.class)
+public class ServerMessage<T extends BaseSocketMessage> {
 
     private T data;
 
-    private ServerRequestType type;
+    private ServerMessageType type;
 
 }

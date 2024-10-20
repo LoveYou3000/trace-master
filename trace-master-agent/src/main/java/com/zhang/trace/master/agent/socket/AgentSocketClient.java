@@ -1,12 +1,12 @@
 package com.zhang.trace.master.agent.socket;
 
-import com.zhang.trace.master.agent.socket.handler.ServerRequestHandler;
-import com.zhang.trace.master.core.config.socket.request.AgentRequest;
-import com.zhang.trace.master.core.config.socket.request.AgentRequestType;
-import com.zhang.trace.master.core.config.socket.request.ServerRequest;
-import com.zhang.trace.master.core.config.socket.request.domain.HeartBeatRequest;
-import com.zhang.trace.master.core.config.socket.request.domain.RegistryRequest;
-import com.zhang.trace.master.core.config.socket.request.domain.UnRegistryRequest;
+import com.zhang.trace.master.agent.socket.handler.ServerMessageHandler;
+import com.zhang.trace.master.core.config.socket.request.AgentMessage;
+import com.zhang.trace.master.core.config.socket.request.AgentMessageType;
+import com.zhang.trace.master.core.config.socket.request.ServerMessage;
+import com.zhang.trace.master.core.config.socket.request.domain.HeartBeatMessage;
+import com.zhang.trace.master.core.config.socket.request.domain.RegistryMessage;
+import com.zhang.trace.master.core.config.socket.request.domain.UnRegistryMessage;
 import com.zhang.trace.master.core.config.util.JacksonUtil;
 import lombok.Setter;
 import org.java_websocket.client.WebSocketClient;
@@ -47,8 +47,8 @@ public class AgentSocketClient extends WebSocketClient {
 
     @Override
     public void onMessage(String s) {
-        ServerRequest<?> serverRequest = JacksonUtil.parseObj(s, ServerRequest.class);
-        ServerRequestHandler.getServerRequestHandler(serverRequest.getType()).handleMessage(serverRequest.getData(), this);
+        ServerMessage<?> serverMessage = JacksonUtil.parseObj(s, ServerMessage.class);
+        ServerMessageHandler.getServerRequestHandler(serverMessage.getType()).handleMessage(serverMessage.getData(), this);
     }
 
     @Override
@@ -61,48 +61,46 @@ public class AgentSocketClient extends WebSocketClient {
 
     }
 
-    private void send(AgentRequest<?> agentRequest) {
-        send(JacksonUtil.toJsonString(agentRequest));
+    private void send(AgentMessage<?> agentMessage) {
+        send(JacksonUtil.toJsonString(agentMessage));
     }
 
     private void register() {
-        RegistryRequest registryRequest = new RegistryRequest();
+        RegistryMessage registryRequest = new RegistryMessage();
         registryRequest.setAppId(appId);
 
-        AgentRequest<RegistryRequest> agentRequest = new AgentRequest<>();
-        agentRequest.setData(registryRequest);
-        agentRequest.setType(AgentRequestType.REGISTER);
+        AgentMessage<RegistryMessage> agentMessage = new AgentMessage<>();
+        agentMessage.setData(registryRequest);
+        agentMessage.setType(AgentMessageType.REGISTER);
 
-        send(agentRequest);
+        send(agentMessage);
     }
 
     private void unRegister() {
-        UnRegistryRequest unRegistryRequest = new UnRegistryRequest();
+        UnRegistryMessage unRegistryRequest = new UnRegistryMessage();
         unRegistryRequest.setAppId(appId);
         unRegistryRequest.setInstanceId(instanceId);
 
-        AgentRequest<UnRegistryRequest> agentRequest = new AgentRequest<>();
-        agentRequest.setData(unRegistryRequest);
-        agentRequest.setType(AgentRequestType.UNREGISTER);
+        AgentMessage<UnRegistryMessage> agentMessage = new AgentMessage<>();
+        agentMessage.setData(unRegistryRequest);
+        agentMessage.setType(AgentMessageType.UNREGISTER);
 
-        send(agentRequest);
+        send(agentMessage);
     }
 
     private void heartbeat() {
         HEARTBEAT_EXECUTOR.scheduleAtFixedRate(() -> {
-            HeartBeatRequest heartBeatRequest = new HeartBeatRequest();
+            HeartBeatMessage heartBeatRequest = new HeartBeatMessage();
             heartBeatRequest.setPing(PING);
             heartBeatRequest.setAppId(appId);
             heartBeatRequest.setInstanceId(instanceId);
 
-            AgentRequest<HeartBeatRequest> agentRequest = new AgentRequest<>();
-            agentRequest.setData(heartBeatRequest);
-            agentRequest.setType(AgentRequestType.HEARTBEAT);
+            AgentMessage<HeartBeatMessage> agentMessage = new AgentMessage<>();
+            agentMessage.setData(heartBeatRequest);
+            agentMessage.setType(AgentMessageType.HEARTBEAT);
 
-            send(agentRequest);
+            send(agentMessage);
         }, 10, 10, TimeUnit.SECONDS);
-
-
     }
 
 }

@@ -1,6 +1,6 @@
 package com.zhang.trace.master.server.socket.handler;
 
-import com.zhang.trace.master.core.config.socket.request.AgentRequestType;
+import com.zhang.trace.master.core.config.socket.request.AgentMessageType;
 import com.zhang.trace.master.server.socket.handler.impl.FetchConfigRequestHandler;
 import com.zhang.trace.master.server.socket.handler.impl.HeartBeatRequestHandler;
 import com.zhang.trace.master.server.socket.handler.impl.RegisterRequestHandler;
@@ -8,7 +8,7 @@ import com.zhang.trace.master.server.socket.handler.impl.UnRegisterRequestHandle
 import org.springframework.web.socket.WebSocketSession;
 
 /**
- * agent 向 server 发送的消息处理接口
+ * agent 向 server 发送的消息处理器接口
  *
  * @author zhang
  * @date 2024-10-16 17:15
@@ -29,11 +29,11 @@ public interface AgentRequestHandler<T> {
     /**
      * 获取消息类型对应的消息处理器
      *
-     * @param agentRequestType 消息类型
+     * @param agentMessageType 消息类型
      * @return 消息处理器
      */
-    static AgentRequestHandler<?> getAgentRequestHandler(AgentRequestType agentRequestType) {
-        switch (agentRequestType) {
+    static AgentRequestHandler<?> getAgentRequestHandler(AgentMessageType agentMessageType) {
+        switch (agentMessageType) {
             case HEARTBEAT -> {
                 return new HeartBeatRequestHandler();
             }
@@ -46,9 +46,7 @@ public interface AgentRequestHandler<T> {
             case FETCH_CONFIG -> {
                 return new FetchConfigRequestHandler();
             }
-            default -> {
-                throw new RuntimeException("未适配的请求类型:" + agentRequestType);
-            }
+            default -> throw new RuntimeException("未适配的请求类型:" + agentMessageType);
         }
     }
 

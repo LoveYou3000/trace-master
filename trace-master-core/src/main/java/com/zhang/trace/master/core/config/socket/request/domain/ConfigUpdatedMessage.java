@@ -4,13 +4,18 @@ import lombok.Data;
 import lombok.EqualsAndHashCode;
 
 /**
- * 收到的反注册消息
+ * 配置已更新消息
  *
  * @author zhang
- * @date 2024-10-18 09:50
+ * @date 2024-10-18 14:46
  */
 @Data
 @EqualsAndHashCode(callSuper = true)
-public class UnRegistryRequest extends BaseRequest {
+public class ConfigUpdatedMessage extends BaseSocketMessage {
+
+    /**
+     * 上次更新时间
+     */
+    private Long lastUpdate;
 
 }

@@ -2,7 +2,6 @@ package com.zhang.trace.master.core.config.util;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.core.TreeNode;
-import com.fasterxml.jackson.databind.JsonMappingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.SneakyThrows;
 
@@ -21,7 +20,7 @@ public class JacksonUtil {
         return OBJECT_MAPPER.writeValueAsString(obj);
     }
 
-    @SneakyThrows({JsonProcessingException.class})
+    @SneakyThrows(JsonProcessingException.class)
     public static <T> T parseObj(String json, Class<T> klz) {
         return OBJECT_MAPPER.readValue(json, klz);
     }

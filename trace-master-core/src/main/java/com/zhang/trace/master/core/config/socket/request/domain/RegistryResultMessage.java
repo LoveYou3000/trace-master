@@ -4,18 +4,12 @@ import lombok.Data;
 import lombok.EqualsAndHashCode;
 
 /**
- * 收到的配置已更新消息
+ * 注册结果消息
  *
  * @author zhang
- * @date 2024-10-18 14:46
+ * @date 2024-10-18 16:55
  */
 @Data
 @EqualsAndHashCode(callSuper = true)
-public class ConfigUpdatedRequest extends BaseRequest {
-
-    /**
-     * 上次更新时间
-     */
-    private Long lastUpdate;
-
+public class RegistryResultMessage extends BaseSocketMessage {
 }

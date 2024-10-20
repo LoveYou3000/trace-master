@@ -1,8 +1,9 @@
 package com.zhang.trace.master.agent.socket.handler;
 
-import com.zhang.trace.master.agent.socket.handler.impl.ConfigUpdatedRequestHandler;
-import com.zhang.trace.master.agent.socket.handler.impl.RegistryResultRequestHandler;
-import com.zhang.trace.master.core.config.socket.request.ServerRequestType;
+import com.zhang.trace.master.agent.socket.handler.impl.ConfigUpdatedMessageHandler;
+import com.zhang.trace.master.agent.socket.handler.impl.HeartBeatMessageHandler;
+import com.zhang.trace.master.agent.socket.handler.impl.RegistryResultMessageHandler;
+import com.zhang.trace.master.core.config.socket.request.ServerMessageType;
 import org.java_websocket.client.WebSocketClient;
 
 /**
@@ -11,7 +12,7 @@ import org.java_websocket.client.WebSocketClient;
  * @author zhang
  * @date 2024-10-16 17:19
  */
-public interface ServerRequestHandler<T> {
+public interface ServerMessageHandler<T> {
 
     /**
      * 处理 server 向 agent 发送的消息
@@ -27,20 +28,21 @@ public interface ServerRequestHandler<T> {
     /**
      * 获取消息类型对应的消息处理器
      *
-     * @param serverRequestType 消息类型
+     * @param serverMessageType 消息类型
      * @return 消息处理器
      */
-    static ServerRequestHandler<?> getServerRequestHandler(ServerRequestType serverRequestType) {
-        switch (serverRequestType) {
+    static ServerMessageHandler<?> getServerRequestHandler(ServerMessageType serverMessageType) {
+        switch (serverMessageType) {
+            case HEARTBEAT_RESULT -> {
+                return new HeartBeatMessageHandler();
+            }
             case REGISTRY_RESULT -> {
-                return new RegistryResultRequestHandler();
+                return new RegistryResultMessageHandler();
             }
             case CONFIG_UPDATED -> {
-                return new ConfigUpdatedRequestHandler();
+                return new ConfigUpdatedMessageHandler();
             }
-            default -> {
-                throw new RuntimeException("未适配的请求类型:" + serverRequestType);
-            }
+            default -> throw new RuntimeException("未适配的请求类型:" + serverMessageType);
         }
     }
 
