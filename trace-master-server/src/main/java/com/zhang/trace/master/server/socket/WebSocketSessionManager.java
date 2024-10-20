@@ -92,11 +92,31 @@ public class WebSocketSessionManager {
     }
 
     /**
+     * 向某个 appId 对应的所有会话广播消息
+     *
+     * @param appId   appId
+     * @param message 要发送的消息
+     */
+    public static void broadcastMessage(@NonNull String appId, @NonNull ServerMessage<? extends BaseSocketMessage> message) {
+        TextMessage textMessage = new TextMessage(JacksonUtil.toJsonString(message));
+        getSessions(appId).forEach(session -> sendMessage(session, textMessage));
+    }
+
+    /**
      * 向所有会话广播消息
      *
      * @param message 要发送的消息
      */
     public static void broadcastMessage(@NonNull String message) {
+        SESSION_HOLDER.forEach((appId, sessions) -> broadcastMessage(appId, message));
+    }
+
+    /**
+     * 向所有会话广播消息
+     *
+     * @param message 要发送的消息
+     */
+    public static void broadcastMessage(@NonNull ServerMessage<? extends BaseSocketMessage> message) {
         SESSION_HOLDER.forEach((appId, sessions) -> broadcastMessage(appId, message));
     }
 
