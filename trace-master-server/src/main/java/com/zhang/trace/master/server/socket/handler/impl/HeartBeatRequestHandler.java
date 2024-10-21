@@ -1,7 +1,7 @@
 package com.zhang.trace.master.server.socket.handler.impl;
 
-import com.zhang.trace.master.core.config.socket.request.ServerMessage;
-import com.zhang.trace.master.core.config.socket.request.ServerMessageType;
+import com.zhang.trace.master.core.config.socket.request.SocketMessage;
+import com.zhang.trace.master.core.config.socket.request.SocketMessageType;
 import com.zhang.trace.master.core.config.socket.request.domain.HeartBeatMessage;
 import com.zhang.trace.master.server.socket.WebSocketSessionManager;
 import com.zhang.trace.master.server.socket.handler.AgentRequestHandler;
@@ -32,9 +32,7 @@ public class HeartBeatRequestHandler implements AgentRequestHandler<HeartBeatMes
         HeartBeatMessage heartBeatResponse = new HeartBeatMessage();
         heartBeatResponse.setPong(PONG);
 
-        ServerMessage<HeartBeatMessage> serverMessage = new ServerMessage<>();
-        serverMessage.setData(heartBeatResponse);
-        serverMessage.setType(ServerMessageType.HEARTBEAT_RESULT);
+        SocketMessage<HeartBeatMessage> serverMessage = new SocketMessage<>(heartBeatResponse, SocketMessageType.HEARTBEAT_RESULT);
 
         WebSocketSessionManager.sendMessage(heartBeatRequest.getAppId(), heartBeatRequest.getInstanceId(), serverMessage);
     }

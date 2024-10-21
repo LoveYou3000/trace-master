@@ -2,15 +2,23 @@
 
 ## 项目功能
 
-### 管理端
+### trace-master-server
 
-1. 查看所有 trace master 实例，包括通过 javaagent 注入的、attach 到相应的 jvm 、trace-master-spring-boot-starter 等使用方式
-2. 开启/关闭对应的 trace master 实例
-3. 修改对应的 trace master 的配置
-4. 进入对应的 trace master 实例，查询 h2 中的调用，并查看某次调用的调用链路以及耗时
-5. 进入对应的 trace master 实例，通过 trace id 查询对应的 spring 项目的一次调用链路以及耗时
+1. 实例管理
+   1. 查看所有 trace master 实例信息
+   2. 启停 trace master 实例
 
-### trace master 实例
+2. 配置管理
+   1. 查看所有配置
+   2. 修改配置
+   3. 分发配置
+
+3. 调用链路管理
+   1. 查看所有调用链路
+   2. 查看链路详情
+
+
+### trace-master-agent
 
 1. 与管理端建立长链，发送心跳，获取配置
 2. 根据配置，对指定的类进行字节码增强，统计调用链路以及耗时，并生成单笔唯一的 trace id，上送给管理端

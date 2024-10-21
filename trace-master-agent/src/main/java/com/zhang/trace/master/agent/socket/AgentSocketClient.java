@@ -1,9 +1,8 @@
 package com.zhang.trace.master.agent.socket;
 
 import com.zhang.trace.master.agent.socket.handler.ServerMessageHandler;
-import com.zhang.trace.master.core.config.socket.request.AgentMessage;
-import com.zhang.trace.master.core.config.socket.request.AgentMessageType;
-import com.zhang.trace.master.core.config.socket.request.ServerMessage;
+import com.zhang.trace.master.core.config.socket.request.SocketMessage;
+import com.zhang.trace.master.core.config.socket.request.SocketMessageType;
 import com.zhang.trace.master.core.config.socket.request.domain.HeartBeatMessage;
 import com.zhang.trace.master.core.config.socket.request.domain.RegistryMessage;
 import com.zhang.trace.master.core.config.socket.request.domain.UnRegistryMessage;
@@ -47,8 +46,8 @@ public class AgentSocketClient extends WebSocketClient {
 
     @Override
     public void onMessage(String s) {
-        ServerMessage<?> serverMessage = JacksonUtil.parseObj(s, ServerMessage.class);
-        ServerMessageHandler.getServerRequestHandler(serverMessage.getType()).handleMessage(serverMessage.getData(), this);
+        SocketMessage<?> serverMessage = JacksonUtil.parseObj(s, SocketMessage.class);
+        ServerMessageHandler.getServerRequestHandler(serverMessage.type()).handleMessage(serverMessage.data(), this);
     }
 
     @Override
@@ -61,7 +60,7 @@ public class AgentSocketClient extends WebSocketClient {
 
     }
 
-    private void send(AgentMessage<?> agentMessage) {
+    private void send(SocketMessage<?> agentMessage) {
         send(JacksonUtil.toJsonString(agentMessage));
     }
 
@@ -69,9 +68,7 @@ public class AgentSocketClient extends WebSocketClient {
         RegistryMessage registryRequest = new RegistryMessage();
         registryRequest.setAppId(appId);
 
-        AgentMessage<RegistryMessage> agentMessage = new AgentMessage<>();
-        agentMessage.setData(registryRequest);
-        agentMessage.setType(AgentMessageType.REGISTER);
+        SocketMessage<RegistryMessage> agentMessage = new SocketMessage<>(registryRequest, SocketMessageType.REGISTER);
 
         send(agentMessage);
     }
@@ -81,9 +78,7 @@ public class AgentSocketClient extends WebSocketClient {
         unRegistryRequest.setAppId(appId);
         unRegistryRequest.setInstanceId(instanceId);
 
-        AgentMessage<UnRegistryMessage> agentMessage = new AgentMessage<>();
-        agentMessage.setData(unRegistryRequest);
-        agentMessage.setType(AgentMessageType.UNREGISTER);
+        SocketMessage<UnRegistryMessage> agentMessage = new SocketMessage<>(unRegistryRequest, SocketMessageType.UNREGISTER);
 
         send(agentMessage);
     }
@@ -95,9 +90,7 @@ public class AgentSocketClient extends WebSocketClient {
             heartBeatRequest.setAppId(appId);
             heartBeatRequest.setInstanceId(instanceId);
 
-            AgentMessage<HeartBeatMessage> agentMessage = new AgentMessage<>();
-            agentMessage.setData(heartBeatRequest);
-            agentMessage.setType(AgentMessageType.HEARTBEAT);
+            SocketMessage<HeartBeatMessage> agentMessage = new SocketMessage<>(heartBeatRequest, SocketMessageType.HEARTBEAT);
 
             send(agentMessage);
         }, 10, 10, TimeUnit.SECONDS);

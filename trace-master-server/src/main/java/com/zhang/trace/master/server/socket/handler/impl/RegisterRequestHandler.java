@@ -1,7 +1,7 @@
 package com.zhang.trace.master.server.socket.handler.impl;
 
-import com.zhang.trace.master.core.config.socket.request.ServerMessage;
-import com.zhang.trace.master.core.config.socket.request.ServerMessageType;
+import com.zhang.trace.master.core.config.socket.request.SocketMessage;
+import com.zhang.trace.master.core.config.socket.request.SocketMessageType;
 import com.zhang.trace.master.core.config.socket.request.domain.RegistryResultMessage;
 import com.zhang.trace.master.server.socket.WebSocketSessionManager;
 import com.zhang.trace.master.server.socket.handler.AgentRequestHandler;
@@ -28,9 +28,7 @@ public class RegisterRequestHandler implements AgentRequestHandler<RegistryMessa
         registryResultRequest.setAppId(registryRequest.getAppId());
         registryResultRequest.setInstanceId(instanceId);
 
-        ServerMessage<RegistryResultMessage> serverMessage = new ServerMessage<>();
-        serverMessage.setData(registryResultRequest);
-        serverMessage.setType(ServerMessageType.REGISTRY_RESULT);
+        SocketMessage<RegistryResultMessage> serverMessage = new SocketMessage<>(registryResultRequest, SocketMessageType.REGISTRY_RESULT);
 
         WebSocketSessionManager.saveSession(registryRequest.getAppId(), instanceId, session);
         WebSocketSessionManager.sendMessage(registryRequest.getAppId(), instanceId, serverMessage);

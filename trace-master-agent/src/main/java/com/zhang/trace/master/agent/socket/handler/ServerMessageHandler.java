@@ -3,7 +3,7 @@ package com.zhang.trace.master.agent.socket.handler;
 import com.zhang.trace.master.agent.socket.handler.impl.ConfigUpdatedMessageHandler;
 import com.zhang.trace.master.agent.socket.handler.impl.HeartBeatMessageHandler;
 import com.zhang.trace.master.agent.socket.handler.impl.RegistryResultMessageHandler;
-import com.zhang.trace.master.core.config.socket.request.ServerMessageType;
+import com.zhang.trace.master.core.config.socket.request.SocketMessageType;
 import org.java_websocket.client.WebSocketClient;
 
 /**
@@ -31,7 +31,7 @@ public interface ServerMessageHandler<T> {
      * @param serverMessageType 消息类型
      * @return 消息处理器
      */
-    static ServerMessageHandler<?> getServerRequestHandler(ServerMessageType serverMessageType) {
+    static ServerMessageHandler<?> getServerRequestHandler(SocketMessageType serverMessageType) {
         switch (serverMessageType) {
             case HEARTBEAT_RESULT -> {
                 return new HeartBeatMessageHandler();

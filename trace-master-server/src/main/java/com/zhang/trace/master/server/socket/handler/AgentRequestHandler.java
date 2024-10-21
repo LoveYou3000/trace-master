@@ -1,6 +1,6 @@
 package com.zhang.trace.master.server.socket.handler;
 
-import com.zhang.trace.master.core.config.socket.request.AgentMessageType;
+import com.zhang.trace.master.core.config.socket.request.SocketMessageType;
 import com.zhang.trace.master.server.socket.handler.impl.FetchConfigRequestHandler;
 import com.zhang.trace.master.server.socket.handler.impl.HeartBeatRequestHandler;
 import com.zhang.trace.master.server.socket.handler.impl.RegisterRequestHandler;
@@ -32,7 +32,7 @@ public interface AgentRequestHandler<T> {
      * @param agentMessageType 消息类型
      * @return 消息处理器
      */
-    static AgentRequestHandler<?> getAgentRequestHandler(AgentMessageType agentMessageType) {
+    static AgentRequestHandler<?> getAgentRequestHandler(SocketMessageType agentMessageType) {
         switch (agentMessageType) {
             case HEARTBEAT -> {
                 return new HeartBeatRequestHandler();

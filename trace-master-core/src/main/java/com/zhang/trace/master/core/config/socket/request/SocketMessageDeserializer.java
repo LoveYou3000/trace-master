@@ -11,20 +11,20 @@ import com.zhang.trace.master.core.config.util.JacksonUtil;
 import java.io.IOException;
 
 /**
- * AgentRequest 的反序列
+ * socketMessage 自定义反序列器
  *
  * @author zhang
- * @date 2024-10-18 10:20
+ * @date 2024-10-21 17:06
  */
-public class AgentMessageDeserializer extends JsonDeserializer<AgentMessage<?>> {
+public class SocketMessageDeserializer extends JsonDeserializer<SocketMessage<?>> {
 
     @Override
-    public AgentMessage<?> deserialize(JsonParser jp, DeserializationContext deserializationContext) throws IOException, JacksonException {
+    public SocketMessage<?> deserialize(JsonParser jp, DeserializationContext deserializationContext) throws IOException, JacksonException {
         JsonNode node = jp.getCodec().readTree(jp);
 
         // 获取 type 字段并解析为 MessageType
         String typeValue = node.get("type").asText();
-        AgentMessageType messageType = AgentMessageType.valueOf(typeValue.toUpperCase());
+        SocketMessageType messageType = SocketMessageType.valueOf(typeValue.toUpperCase());
 
         // 获取 data 字段并根据 type 的 paramKlz 转换
         JsonNode dataNode = node.get("data");
@@ -34,11 +34,7 @@ public class AgentMessageDeserializer extends JsonDeserializer<AgentMessage<?>> 
         BaseSocketMessage data = JacksonUtil.parseTreeNodeObj(dataNode, paramKlz);
 
         // 创建并返回 Message 对象
-        AgentMessage<BaseSocketMessage> message = new AgentMessage<>();
-        message.setData(data);
-        message.setType(messageType);
-
-        return message;
+        return new SocketMessage<>(data, messageType);
     }
 
 }

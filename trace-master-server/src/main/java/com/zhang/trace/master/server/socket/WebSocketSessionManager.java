@@ -1,6 +1,6 @@
 package com.zhang.trace.master.server.socket;
 
-import com.zhang.trace.master.core.config.socket.request.ServerMessage;
+import com.zhang.trace.master.core.config.socket.request.SocketMessage;
 import com.zhang.trace.master.core.config.socket.request.domain.BaseSocketMessage;
 import com.zhang.trace.master.core.config.util.JacksonUtil;
 import lombok.NonNull;
@@ -97,7 +97,7 @@ public class WebSocketSessionManager {
      * @param appId   appId
      * @param message 要发送的消息
      */
-    public static void broadcastMessage(@NonNull String appId, @NonNull ServerMessage<? extends BaseSocketMessage> message) {
+    public static void broadcastMessage(@NonNull String appId, @NonNull SocketMessage<? extends BaseSocketMessage> message) {
         TextMessage textMessage = new TextMessage(JacksonUtil.toJsonString(message));
         getSessions(appId).forEach(session -> sendMessage(session, textMessage));
     }
@@ -116,7 +116,7 @@ public class WebSocketSessionManager {
      *
      * @param message 要发送的消息
      */
-    public static void broadcastMessage(@NonNull ServerMessage<? extends BaseSocketMessage> message) {
+    public static void broadcastMessage(@NonNull SocketMessage<? extends BaseSocketMessage> message) {
         SESSION_HOLDER.forEach((appId, sessions) -> broadcastMessage(appId, message));
     }
 
@@ -127,7 +127,7 @@ public class WebSocketSessionManager {
      * @param instanceId    实例id
      * @param serverMessage 要发送的消息实体类
      */
-    public static void sendMessage(@NonNull String appId, @NonNull String instanceId, @NonNull ServerMessage<? extends BaseSocketMessage> serverMessage) {
+    public static void sendMessage(@NonNull String appId, @NonNull String instanceId, @NonNull SocketMessage<? extends BaseSocketMessage> serverMessage) {
         sendMessage(SESSION_HOLDER.getOrDefault(appId, new ConcurrentHashMap<>(MAP_INIT_SIZE)).get(instanceId), serverMessage);
     }
 
@@ -159,7 +159,7 @@ public class WebSocketSessionManager {
      * @param session       会话
      * @param serverMessage 要发送的消息实体类
      */
-    public static void sendMessage(@NonNull WebSocketSession session, @NonNull ServerMessage<? extends BaseSocketMessage> serverMessage) {
+    public static void sendMessage(@NonNull WebSocketSession session, @NonNull SocketMessage<? extends BaseSocketMessage> serverMessage) {
         sendMessage(session, JacksonUtil.toJsonString(serverMessage));
     }
 

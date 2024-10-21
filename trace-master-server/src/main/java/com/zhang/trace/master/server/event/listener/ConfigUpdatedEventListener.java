@@ -1,7 +1,7 @@
 package com.zhang.trace.master.server.event.listener;
 
-import com.zhang.trace.master.core.config.socket.request.ServerMessage;
-import com.zhang.trace.master.core.config.socket.request.ServerMessageType;
+import com.zhang.trace.master.core.config.socket.request.SocketMessage;
+import com.zhang.trace.master.core.config.socket.request.SocketMessageType;
 import com.zhang.trace.master.core.config.socket.request.domain.ConfigUpdatedMessage;
 import com.zhang.trace.master.server.event.ConfigUpdatedEvent;
 import com.zhang.trace.master.server.socket.WebSocketSessionManager;
@@ -24,9 +24,7 @@ public class ConfigUpdatedEventListener implements ApplicationListener<ConfigUpd
         configUpdatedMessage.setAppId(event.getAppId());
         configUpdatedMessage.setLastUpdate(event.getLastUpdate());
 
-        ServerMessage<ConfigUpdatedMessage> serverMessage = new ServerMessage<>();
-        serverMessage.setData(configUpdatedMessage);
-        serverMessage.setType(ServerMessageType.CONFIG_UPDATED);
+        SocketMessage<ConfigUpdatedMessage> serverMessage = new SocketMessage<>(configUpdatedMessage, SocketMessageType.CONFIG_UPDATED);
 
         WebSocketSessionManager.broadcastMessage(event.getAppId(), serverMessage);
     }
