@@ -84,16 +84,14 @@ public class AgentSocketClient extends WebSocketClient {
     }
 
     private void heartbeat() {
-        HEARTBEAT_EXECUTOR.scheduleAtFixedRate(() -> {
-            HeartBeatMessage heartBeatRequest = new HeartBeatMessage();
-            heartBeatRequest.setPing(PING);
-            heartBeatRequest.setAppId(appId);
-            heartBeatRequest.setInstanceId(instanceId);
+        HeartBeatMessage heartBeatRequest = new HeartBeatMessage();
+        heartBeatRequest.setPing(PING);
+        heartBeatRequest.setAppId(appId);
+        heartBeatRequest.setInstanceId(instanceId);
 
-            SocketMessage<HeartBeatMessage> agentMessage = new SocketMessage<>(heartBeatRequest, SocketMessageType.HEARTBEAT);
+        SocketMessage<HeartBeatMessage> agentMessage = new SocketMessage<>(heartBeatRequest, SocketMessageType.HEARTBEAT);
 
-            send(agentMessage);
-        }, 10, 10, TimeUnit.SECONDS);
+        HEARTBEAT_EXECUTOR.scheduleAtFixedRate(() -> send(agentMessage), 10, 10, TimeUnit.SECONDS);
     }
 
 }

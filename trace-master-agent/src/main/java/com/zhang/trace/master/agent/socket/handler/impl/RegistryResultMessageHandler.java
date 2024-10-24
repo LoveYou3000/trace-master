@@ -15,7 +15,11 @@ public class RegistryResultMessageHandler implements ServerMessageHandler<Regist
 
     @Override
     public void handle(RegistryResultMessage registryResultRequest, WebSocketClient session) {
-        AgentSocketClient.setInstanceId(registryResultRequest.getInstanceId());
+        String instanceId = registryResultRequest.getInstanceId();
+        if (null == instanceId || instanceId.isBlank()) {
+            throw new RuntimeException("注册失败，请检查 server 端状态");
+        }
+        AgentSocketClient.setInstanceId(instanceId);
     }
 
 }
