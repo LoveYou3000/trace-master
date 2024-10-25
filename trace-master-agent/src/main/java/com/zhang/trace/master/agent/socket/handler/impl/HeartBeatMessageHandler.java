@@ -1,8 +1,8 @@
 package com.zhang.trace.master.agent.socket.handler.impl;
 
+import com.zhang.trace.master.agent.socket.AgentSocketClient;
 import com.zhang.trace.master.agent.socket.handler.ServerMessageHandler;
 import com.zhang.trace.master.core.config.socket.request.domain.HeartBeatMessage;
-import org.java_websocket.client.WebSocketClient;
 
 import java.util.Objects;
 
@@ -17,7 +17,7 @@ public class HeartBeatMessageHandler implements ServerMessageHandler<HeartBeatMe
     private static final String PONG = "pong";
 
     @Override
-    public void handle(HeartBeatMessage heartBeatMessage, WebSocketClient session) {
+    public void handle(HeartBeatMessage heartBeatMessage, AgentSocketClient session) {
         if (!Objects.equals(heartBeatMessage.getPong(), PONG)) {
             throw new RuntimeException("wrong heartbeat data:" + heartBeatMessage.getPong());
         }

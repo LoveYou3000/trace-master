@@ -1,10 +1,10 @@
 package com.zhang.trace.master.agent.socket.handler;
 
+import com.zhang.trace.master.agent.socket.AgentSocketClient;
 import com.zhang.trace.master.agent.socket.handler.impl.ConfigUpdatedMessageHandler;
 import com.zhang.trace.master.agent.socket.handler.impl.HeartBeatMessageHandler;
 import com.zhang.trace.master.agent.socket.handler.impl.RegistryResultMessageHandler;
 import com.zhang.trace.master.core.config.socket.request.SocketMessageType;
-import org.java_websocket.client.WebSocketClient;
 
 /**
  * server 向 agent 发送的消息处理接口
@@ -21,7 +21,7 @@ public interface ServerMessageHandler<T> {
      * @param session 会话
      */
     @SuppressWarnings("unchecked")
-    default void handleMessage(Object data, WebSocketClient session) {
+    default void handleMessage(Object data, AgentSocketClient session) {
         handle((T) data, session);
     }
 
@@ -52,6 +52,6 @@ public interface ServerMessageHandler<T> {
      * @param data    server 向 agent 发送的消息体
      * @param session 会话
      */
-    void handle(T data, WebSocketClient session);
+    void handle(T data, AgentSocketClient session);
 
 }

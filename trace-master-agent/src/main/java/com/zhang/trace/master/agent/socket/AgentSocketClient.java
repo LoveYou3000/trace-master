@@ -8,6 +8,7 @@ import com.zhang.trace.master.core.config.socket.request.domain.RegistryMessage;
 import com.zhang.trace.master.core.config.socket.request.domain.UnRegistryMessage;
 import com.zhang.trace.master.core.config.util.JacksonUtil;
 import lombok.Setter;
+import lombok.extern.slf4j.Slf4j;
 import org.java_websocket.client.WebSocketClient;
 import org.java_websocket.handshake.ServerHandshake;
 
@@ -22,19 +23,21 @@ import java.util.concurrent.TimeUnit;
  * @author zhang
  * @date 2024-10-18 15:16
  */
+@Slf4j
 public class AgentSocketClient extends WebSocketClient {
 
     private static final String PING = "ping";
 
-    private static final ScheduledExecutorService HEARTBEAT_EXECUTOR = Executors.newSingleThreadScheduledExecutor();
+    private final ScheduledExecutorService HEARTBEAT_EXECUTOR = Executors.newSingleThreadScheduledExecutor();
 
-    private static final String appId = "java-normal-test";
+    private final String appId;
 
     @Setter
-    private static String instanceId;
+    private String instanceId;
 
-    public AgentSocketClient(URI serverUri) {
+    public AgentSocketClient(URI serverUri, String appId) {
         super(serverUri);
+        this.appId = appId;
     }
 
     @Override
@@ -65,6 +68,7 @@ public class AgentSocketClient extends WebSocketClient {
     }
 
     private void register() {
+        log.info("注册");
         RegistryMessage registryRequest = new RegistryMessage();
         registryRequest.setAppId(appId);
 
@@ -74,6 +78,7 @@ public class AgentSocketClient extends WebSocketClient {
     }
 
     private void unRegister() {
+        log.info("反注册");
         UnRegistryMessage unRegistryRequest = new UnRegistryMessage();
         unRegistryRequest.setAppId(appId);
         unRegistryRequest.setInstanceId(instanceId);
@@ -84,6 +89,7 @@ public class AgentSocketClient extends WebSocketClient {
     }
 
     private void heartbeat() {
+        log.info("心跳");
         HeartBeatMessage heartBeatRequest = new HeartBeatMessage();
         heartBeatRequest.setPing(PING);
         heartBeatRequest.setAppId(appId);
