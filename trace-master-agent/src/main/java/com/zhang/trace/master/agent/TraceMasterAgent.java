@@ -2,7 +2,6 @@ package com.zhang.trace.master.agent;
 
 import com.zhang.trace.master.agent.interceptor.TraceInterceptor;
 import com.zhang.trace.master.agent.socket.AgentSocketClient;
-import com.zhang.trace.master.core.config.TraceMasterAgentConfig;
 import lombok.SneakyThrows;
 import lombok.extern.slf4j.Slf4j;
 import net.bytebuddy.agent.builder.AgentBuilder;
@@ -15,8 +14,10 @@ import net.bytebuddy.matcher.ElementMatchers;
 import java.lang.instrument.Instrumentation;
 import java.net.URI;
 import java.net.URISyntaxException;
+import java.util.concurrent.ArrayBlockingQueue;
 import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
+import java.util.concurrent.ThreadPoolExecutor;
+import java.util.concurrent.TimeUnit;
 
 /**
  * trace-master agent入口类
@@ -27,7 +28,12 @@ import java.util.concurrent.Executors;
 @Slf4j
 public class TraceMasterAgent {
 
-    private static final ExecutorService SOCKET_EXECUTOR = Executors.newSingleThreadExecutor();
+    private static final ExecutorService SOCKET_EXECUTOR = new ThreadPoolExecutor(1, 1, 0, TimeUnit.SECONDS, new ArrayBlockingQueue<>(1),
+            r -> {
+                Thread th = new Thread(r);
+                th.setName("socket-agent");
+                return th;
+            }, new ThreadPoolExecutor.AbortPolicy());
 
     public static void premain(String agentArgs, Instrumentation inst) {
         if (null == agentArgs || agentArgs.isBlank()) {
@@ -38,14 +44,12 @@ public class TraceMasterAgent {
         // 获取主类的名称，当作 appId
         String mainClass = System.getProperty("sun.java.command").split(" ")[0];
         String appId = mainClass.substring(mainClass.lastIndexOf(".") + 1);
-        System.out.println(appId);
 
         // 异步创建与 server 端的连接
         AgentSocketClient socketClient = createSocketConn(agentArgs, appId);
-        TraceMasterAgentConfig config = socketClient.fetchConfig();
 
         // 设置需要进行增强的类
-        ElementMatcher.Junction<? super TypeDescription> classMatcher = classMatcher(config);
+        ElementMatcher.Junction<? super TypeDescription> classMatcher = classMatcher();
 
         // 设置了 main 方法，get/set 方法不进行增强
         AgentBuilder.Transformer transformer = (builder, typeDescription, classLoader, javaModule, protectionDomain) -> builder.method(methodMatcher(typeDescription)).intercept(MethodDelegation.to(TraceInterceptor.class));
@@ -84,7 +88,7 @@ public class TraceMasterAgent {
                 .and(ElementMatchers.isDeclaredBy(typeDescription));
     }
 
-    private static ElementMatcher.Junction<? super TypeDescription> classMatcher(TraceMasterAgentConfig config) {
+    private static ElementMatcher.Junction<? super TypeDescription> classMatcher() {
         return ElementMatchers.not(
                 ElementMatchers.isAnnotation()
         );
