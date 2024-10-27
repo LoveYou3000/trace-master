@@ -6,8 +6,8 @@ import com.zhang.trace.master.core.config.TraceMasterAgentConfig;
 import lombok.SneakyThrows;
 import lombok.extern.slf4j.Slf4j;
 import net.bytebuddy.agent.builder.AgentBuilder;
-import net.bytebuddy.description.NamedElement;
 import net.bytebuddy.description.method.MethodDescription;
+import net.bytebuddy.description.type.TypeDescription;
 import net.bytebuddy.implementation.MethodDelegation;
 import net.bytebuddy.matcher.ElementMatcher;
 import net.bytebuddy.matcher.ElementMatchers;
@@ -15,7 +15,6 @@ import net.bytebuddy.matcher.ElementMatchers;
 import java.lang.instrument.Instrumentation;
 import java.net.URI;
 import java.net.URISyntaxException;
-import java.util.Objects;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
@@ -46,10 +45,10 @@ public class TraceMasterAgent {
         TraceMasterAgentConfig config = socketClient.fetchConfig();
 
         // 设置需要进行增强的类
-        ElementMatcher.Junction<NamedElement> classMatcher = classMatcher(config);
+        ElementMatcher.Junction<? super TypeDescription> classMatcher = classMatcher(config);
 
         // 设置了 main 方法，get/set 方法不进行增强
-        AgentBuilder.Transformer transformer = (builder, typeDescription, classLoader, javaModule, protectionDomain) -> builder.method(methodMatcher()).intercept(MethodDelegation.to(TraceInterceptor.class));
+        AgentBuilder.Transformer transformer = (builder, typeDescription, classLoader, javaModule, protectionDomain) -> builder.method(methodMatcher(typeDescription)).intercept(MethodDelegation.to(TraceInterceptor.class));
 
         // 监听器无操作
         AgentBuilder.Listener listener = AgentBuilder.Listener.NoOp.INSTANCE;
@@ -75,30 +74,20 @@ public class TraceMasterAgent {
         return client;
     }
 
-    private static ElementMatcher.Junction<MethodDescription> methodMatcher() {
+    private static ElementMatcher.Junction<? super MethodDescription> methodMatcher(TypeDescription typeDescription) {
         return ElementMatchers.not(
-                ElementMatchers.isMain()
-                        .or(ElementMatchers.isGetter())
-                        .or(ElementMatchers.isSetter())
-        );
+                        ElementMatchers.isMain()
+                                .or(ElementMatchers.isGetter())
+                                .or(ElementMatchers.isSetter())
+                                .or(ElementMatchers.isClone())
+                )
+                .and(ElementMatchers.isDeclaredBy(typeDescription));
     }
 
-    private static ElementMatcher.Junction<NamedElement> classMatcher(TraceMasterAgentConfig config) {
-        ElementMatcher.Junction<NamedElement> matcher = null;
-        if (Objects.isNull(config) || Objects.isNull(config.getIncludePackages()) || config.getIncludePackages().isEmpty()) {
-            throw new RuntimeException("未配置需要监控的包名");
-        }
-
-        for (String includePackage : config.getIncludePackages()) {
-            ElementMatcher.Junction<NamedElement> curMatcher = ElementMatchers.nameStartsWith(includePackage);
-            if (Objects.isNull(matcher)) {
-                matcher = curMatcher;
-            } else {
-                matcher = matcher.or(curMatcher);
-            }
-        }
-
-        return matcher;
+    private static ElementMatcher.Junction<? super TypeDescription> classMatcher(TraceMasterAgentConfig config) {
+        return ElementMatchers.not(
+                ElementMatchers.isAnnotation()
+        );
     }
 
 }
