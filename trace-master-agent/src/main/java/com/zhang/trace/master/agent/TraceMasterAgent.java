@@ -2,6 +2,8 @@ package com.zhang.trace.master.agent;
 
 import com.zhang.trace.master.agent.interceptor.TraceInterceptor;
 import com.zhang.trace.master.agent.socket.AgentSocketClient;
+import com.zhang.trace.master.core.config.TraceMasterAgentConfig;
+import lombok.SneakyThrows;
 import lombok.extern.slf4j.Slf4j;
 import net.bytebuddy.agent.builder.AgentBuilder;
 import net.bytebuddy.description.NamedElement;
@@ -13,6 +15,7 @@ import net.bytebuddy.matcher.ElementMatchers;
 import java.lang.instrument.Instrumentation;
 import java.net.URI;
 import java.net.URISyntaxException;
+import java.util.Objects;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
@@ -39,10 +42,11 @@ public class TraceMasterAgent {
         System.out.println(appId);
 
         // 异步创建与 server 端的连接
-        createSocketConn(agentArgs, appId);
+        AgentSocketClient socketClient = createSocketConn(agentArgs, appId);
+        TraceMasterAgentConfig config = socketClient.fetchConfig();
 
-        // 设置了本项目的路径不进行增强
-        ElementMatcher.Junction<NamedElement> classMatcher = classMatcher();
+        // 设置需要进行增强的类
+        ElementMatcher.Junction<NamedElement> classMatcher = classMatcher(config);
 
         // 设置了 main 方法，get/set 方法不进行增强
         AgentBuilder.Transformer transformer = (builder, typeDescription, classLoader, javaModule, protectionDomain) -> builder.method(methodMatcher()).intercept(MethodDelegation.to(TraceInterceptor.class));
@@ -57,16 +61,18 @@ public class TraceMasterAgent {
                 .installOn(inst);
     }
 
-    private static void createSocketConn(String socketServer, String appId) {
+    @SneakyThrows(URISyntaxException.class)
+    private static AgentSocketClient createSocketConn(String socketServer, String appId) {
+        AgentSocketClient client = new AgentSocketClient(new URI("ws://" + socketServer + "/socket"), appId);
         SOCKET_EXECUTOR.execute(() -> {
             try {
-                AgentSocketClient client = new AgentSocketClient(new URI("ws://" + socketServer + "/socket"), appId);
                 client.connectBlocking();
-            } catch (InterruptedException | URISyntaxException e) {
+            } catch (InterruptedException e) {
                 log.error("socket 连接失败");
                 throw new RuntimeException(e);
             }
         });
+        return client;
     }
 
     private static ElementMatcher.Junction<MethodDescription> methodMatcher() {
@@ -74,20 +80,25 @@ public class TraceMasterAgent {
                 ElementMatchers.isMain()
                         .or(ElementMatchers.isGetter())
                         .or(ElementMatchers.isSetter())
-                        .or(ElementMatchers.isClone())
-                        .or(ElementMatchers.isConstructor())
         );
     }
 
-    private static ElementMatcher.Junction<NamedElement> classMatcher() {
-        return ElementMatchers.not(
-                ElementMatchers.nameStartsWith("com.zhang.trace.master")
-                        .or(ElementMatchers.nameContains("$"))
-                        .or(ElementMatchers.nameStartsWith("org.springframework.util.LinkedMultiValueMap"))
-                        .or(ElementMatchers.nameStartsWith("org.springframework.beans.factory.support.DefaultListableBeanFactory"))
-                        .or(ElementMatchers.nameStartsWith("org.springframework.boot.SpringApplication"))
-                        .or(ElementMatchers.nameStartsWith("org.springframework.web.context.support.GenericWebApplicationContext"))
-        );
+    private static ElementMatcher.Junction<NamedElement> classMatcher(TraceMasterAgentConfig config) {
+        ElementMatcher.Junction<NamedElement> matcher = null;
+        if (Objects.isNull(config) || Objects.isNull(config.getIncludePackages()) || config.getIncludePackages().isEmpty()) {
+            throw new RuntimeException("未配置需要监控的包名");
+        }
+
+        for (String includePackage : config.getIncludePackages()) {
+            ElementMatcher.Junction<NamedElement> curMatcher = ElementMatchers.nameStartsWith(includePackage);
+            if (Objects.isNull(matcher)) {
+                matcher = curMatcher;
+            } else {
+                matcher = matcher.or(curMatcher);
+            }
+        }
+
+        return matcher;
     }
 
 }

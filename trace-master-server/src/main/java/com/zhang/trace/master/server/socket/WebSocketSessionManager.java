@@ -40,9 +40,9 @@ public class WebSocketSessionManager {
      * @param session    会话信息
      */
     public static void saveSession(@NonNull String appId, @NonNull String instanceId, WebSocketSession session) {
-        SESSION_HOLDER.computeIfAbsent(appId, k -> SESSION_HOLDER.put(k, new ConcurrentHashMap<>(MAP_INIT_SIZE)));
-        Map<String, WebSocketSession> sessions = SESSION_HOLDER.get(appId);
+        Map<String, WebSocketSession> sessions = SESSION_HOLDER.getOrDefault(appId, new ConcurrentHashMap<>(MAP_INIT_SIZE));
         sessions.put(instanceId, session);
+        SESSION_HOLDER.put(appId, sessions);
     }
 
     /**

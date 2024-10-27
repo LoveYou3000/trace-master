@@ -1,6 +1,7 @@
 package com.zhang.trace.master.agent.socket;
 
 import com.zhang.trace.master.agent.socket.handler.ServerMessageHandler;
+import com.zhang.trace.master.core.config.TraceMasterAgentConfig;
 import com.zhang.trace.master.core.config.socket.request.SocketMessage;
 import com.zhang.trace.master.core.config.socket.request.SocketMessageType;
 import com.zhang.trace.master.core.config.socket.request.domain.HeartBeatMessage;
@@ -13,6 +14,7 @@ import org.java_websocket.client.WebSocketClient;
 import org.java_websocket.handshake.ServerHandshake;
 
 import java.net.URI;
+import java.util.Collections;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
@@ -68,7 +70,6 @@ public class AgentSocketClient extends WebSocketClient {
     }
 
     private void register() {
-        log.info("注册");
         RegistryMessage registryRequest = new RegistryMessage();
         registryRequest.setAppId(appId);
 
@@ -78,7 +79,6 @@ public class AgentSocketClient extends WebSocketClient {
     }
 
     private void unRegister() {
-        log.info("反注册");
         UnRegistryMessage unRegistryRequest = new UnRegistryMessage();
         unRegistryRequest.setAppId(appId);
         unRegistryRequest.setInstanceId(instanceId);
@@ -89,15 +89,22 @@ public class AgentSocketClient extends WebSocketClient {
     }
 
     private void heartbeat() {
-        log.info("心跳");
-        HeartBeatMessage heartBeatRequest = new HeartBeatMessage();
-        heartBeatRequest.setPing(PING);
-        heartBeatRequest.setAppId(appId);
-        heartBeatRequest.setInstanceId(instanceId);
+        HEARTBEAT_EXECUTOR.scheduleAtFixedRate(() -> {
+            HeartBeatMessage heartBeatRequest = new HeartBeatMessage();
+            heartBeatRequest.setPing(PING);
+            heartBeatRequest.setAppId(appId);
+            heartBeatRequest.setInstanceId(instanceId);
 
-        SocketMessage<HeartBeatMessage> agentMessage = new SocketMessage<>(heartBeatRequest, SocketMessageType.HEARTBEAT);
+            SocketMessage<HeartBeatMessage> agentMessage = new SocketMessage<>(heartBeatRequest, SocketMessageType.HEARTBEAT);
 
-        HEARTBEAT_EXECUTOR.scheduleAtFixedRate(() -> send(agentMessage), 10, 10, TimeUnit.SECONDS);
+            send(agentMessage);
+        }, 10, 10, TimeUnit.SECONDS);
+    }
+
+    public TraceMasterAgentConfig fetchConfig() {
+        TraceMasterAgentConfig config = new TraceMasterAgentConfig();
+        config.setIncludePackages(Collections.singleton("com.zhang.test.trace"));
+        return config;
     }
 
 }
