@@ -2,6 +2,7 @@ package com.zhang.trace.master.agent;
 
 import com.zhang.trace.master.agent.interceptor.TraceInterceptor;
 import com.zhang.trace.master.agent.socket.AgentSocketClient;
+import com.zhang.trace.master.core.config.util.NamedThreadFactory;
 import lombok.SneakyThrows;
 import lombok.extern.slf4j.Slf4j;
 import net.bytebuddy.agent.builder.AgentBuilder;
@@ -28,12 +29,10 @@ import java.util.concurrent.TimeUnit;
 @Slf4j
 public class TraceMasterAgent {
 
-    private static final ExecutorService SOCKET_EXECUTOR = new ThreadPoolExecutor(1, 1, 0, TimeUnit.SECONDS, new ArrayBlockingQueue<>(1),
-            r -> {
-                Thread th = new Thread(r);
-                th.setName("socket-agent");
-                return th;
-            }, new ThreadPoolExecutor.AbortPolicy());
+    private static final ExecutorService SOCKET_EXECUTOR = new ThreadPoolExecutor(1, 1, 0, TimeUnit.SECONDS,
+            new ArrayBlockingQueue<>(1),
+            new NamedThreadFactory("socket-"),
+            new ThreadPoolExecutor.AbortPolicy());
 
     public static void premain(String agentArgs, Instrumentation inst) {
         if (null == agentArgs || agentArgs.isBlank()) {

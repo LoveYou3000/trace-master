@@ -17,7 +17,6 @@ public class UnRegisterRequestHandler implements AgentRequestHandler<UnRegistryM
 
     @Override
     public void handle(UnRegistryMessage unRegistryRequest, WebSocketSession session) {
-        log.info("收到反注册请求:" + unRegistryRequest);
         WebSocketSessionManager.removeSession(unRegistryRequest.getAppId(), unRegistryRequest.getInstanceId());
     }
 

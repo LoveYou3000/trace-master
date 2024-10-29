@@ -8,6 +8,7 @@ import com.zhang.trace.master.core.config.socket.request.domain.HeartBeatMessage
 import com.zhang.trace.master.core.config.socket.request.domain.RegistryMessage;
 import com.zhang.trace.master.core.config.socket.request.domain.UnRegistryMessage;
 import com.zhang.trace.master.core.config.util.JacksonUtil;
+import com.zhang.trace.master.core.config.util.NamedThreadFactory;
 import lombok.Setter;
 import lombok.extern.slf4j.Slf4j;
 import org.java_websocket.client.WebSocketClient;
@@ -15,8 +16,9 @@ import org.java_websocket.handshake.ServerHandshake;
 
 import java.net.URI;
 import java.util.Collections;
-import java.util.concurrent.Executors;
-import java.util.concurrent.ScheduledExecutorService;
+import java.util.concurrent.ArrayBlockingQueue;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.ThreadPoolExecutor;
 import java.util.concurrent.TimeUnit;
 
 /**
@@ -30,7 +32,10 @@ public class AgentSocketClient extends WebSocketClient {
 
     private static final String PING = "ping";
 
-    private final ScheduledExecutorService HEARTBEAT_EXECUTOR = Executors.newSingleThreadScheduledExecutor();
+    private final ExecutorService HEARTBEAT_EXECUTOR = new ThreadPoolExecutor(1, 1, 0, TimeUnit.SECONDS,
+            new ArrayBlockingQueue<>(1),
+            new NamedThreadFactory("heartbeat-"),
+            new ThreadPoolExecutor.AbortPolicy());
 
     private final String appId;
 
@@ -46,7 +51,10 @@ public class AgentSocketClient extends WebSocketClient {
     public void onOpen(ServerHandshake serverHandshake) {
         register();
         heartbeat();
-        Runtime.getRuntime().addShutdownHook(new Thread(this::close));
+        Runtime.getRuntime().addShutdownHook(new Thread(() -> {
+            log.info("close");
+            this.close();
+        }));
     }
 
     @Override
@@ -89,16 +97,30 @@ public class AgentSocketClient extends WebSocketClient {
     }
 
     private void heartbeat() {
-        HEARTBEAT_EXECUTOR.scheduleAtFixedRate(() -> {
-            HeartBeatMessage heartBeatRequest = new HeartBeatMessage();
-            heartBeatRequest.setPing(PING);
-            heartBeatRequest.setAppId(appId);
-            heartBeatRequest.setInstanceId(instanceId);
+        HEARTBEAT_EXECUTOR.execute(() -> {
+            try {
+                TimeUnit.SECONDS.sleep(10);
+            } catch (InterruptedException e) {
+                throw new RuntimeException(e);
+            }
 
-            SocketMessage<HeartBeatMessage> agentMessage = new SocketMessage<>(heartBeatRequest, SocketMessageType.HEARTBEAT);
+            while (true) {
+                HeartBeatMessage heartBeatRequest = new HeartBeatMessage();
+                heartBeatRequest.setPing(PING);
+                heartBeatRequest.setAppId(appId);
+                heartBeatRequest.setInstanceId(instanceId);
 
-            send(agentMessage);
-        }, 10, 10, TimeUnit.SECONDS);
+                SocketMessage<HeartBeatMessage> agentMessage = new SocketMessage<>(heartBeatRequest, SocketMessageType.HEARTBEAT);
+
+                send(agentMessage);
+
+                try {
+                    TimeUnit.SECONDS.sleep(10);
+                } catch (InterruptedException e) {
+                    throw new RuntimeException(e);
+                }
+            }
+        });
     }
 
     public TraceMasterAgentConfig fetchConfig() {
