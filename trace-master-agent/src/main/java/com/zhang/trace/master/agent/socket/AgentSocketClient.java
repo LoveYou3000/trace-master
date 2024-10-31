@@ -52,7 +52,7 @@ public class AgentSocketClient extends WebSocketClient {
         register();
         heartbeat();
         Runtime.getRuntime().addShutdownHook(new Thread(() -> {
-            log.info("close");
+            unRegister();
             this.close();
         }));
     }
@@ -65,7 +65,7 @@ public class AgentSocketClient extends WebSocketClient {
 
     @Override
     public void onClose(int i, String s, boolean b) {
-        unRegister();
+
     }
 
     @Override

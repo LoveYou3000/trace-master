@@ -1,5 +1,6 @@
 package com.zhang.trace.master.core.config.socket.request;
 
+import com.zhang.trace.master.core.config.socket.request.domain.AgentEnableMessage;
 import com.zhang.trace.master.core.config.socket.request.domain.BaseSocketMessage;
 import com.zhang.trace.master.core.config.socket.request.domain.ConfigUpdatedMessage;
 import com.zhang.trace.master.core.config.socket.request.domain.FetchConfigMessage;
@@ -52,6 +53,11 @@ public enum SocketMessageType {
      * 配置已更新
      */
     CONFIG_UPDATED(ConfigUpdatedMessage.class),
+
+    /**
+     * agent启用
+     */
+    AGENT_ENABLE(AgentEnableMessage.class),
 
     ;
 

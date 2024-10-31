@@ -1,6 +1,7 @@
 package com.zhang.trace.master.agent;
 
 import com.zhang.trace.master.agent.interceptor.TraceInterceptor;
+import com.zhang.trace.master.agent.interceptor.context.TraceMasterContext;
 import com.zhang.trace.master.agent.socket.AgentSocketClient;
 import com.zhang.trace.master.core.config.util.NamedThreadFactory;
 import lombok.SneakyThrows;
@@ -40,12 +41,13 @@ public class TraceMasterAgent {
             return;
         }
 
-        // 获取主类的名称，当作 appId
+        // 获取启动类的名称，当作 appId
         String mainClass = System.getProperty("sun.java.command").split(" ")[0];
         String appId = mainClass.substring(mainClass.lastIndexOf(".") + 1);
 
         // 异步创建与 server 端的连接
         AgentSocketClient socketClient = createSocketConn(agentArgs, appId);
+        TraceMasterContext.setAgentSocketClient(socketClient);
 
         // 设置需要进行增强的类
         ElementMatcher.Junction<? super TypeDescription> classMatcher = classMatcher();

@@ -19,6 +19,8 @@ public class TraceInterceptor {
 
     @RuntimeType
     public static <T> T interceptor(@Origin Method method, @SuperCall Callable<T> callable) throws Exception {
+        Class<?> klz = method.getDeclaringClass();
+
         try {
             return callable.call();
         } finally {
