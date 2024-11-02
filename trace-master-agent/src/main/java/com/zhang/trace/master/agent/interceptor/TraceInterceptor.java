@@ -1,5 +1,6 @@
 package com.zhang.trace.master.agent.interceptor;
 
+import com.zhang.trace.master.agent.interceptor.context.TraceMasterContext;
 import lombok.extern.slf4j.Slf4j;
 import net.bytebuddy.implementation.bind.annotation.Origin;
 import net.bytebuddy.implementation.bind.annotation.RuntimeType;
@@ -19,6 +20,11 @@ public class TraceInterceptor {
 
     @RuntimeType
     public static <T> T interceptor(@Origin Method method, @SuperCall Callable<T> callable) throws Exception {
+        // 未启用时，直接返回，不做任何处理
+        if (!TraceMasterContext.isEnable()) {
+            return callable.call();
+        }
+
         Class<?> klz = method.getDeclaringClass();
 
         try {
