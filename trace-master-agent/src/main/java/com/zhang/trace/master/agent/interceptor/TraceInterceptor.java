@@ -1,6 +1,7 @@
 package com.zhang.trace.master.agent.interceptor;
 
 import com.zhang.trace.master.agent.interceptor.context.TraceMasterContext;
+import com.zhang.trace.master.core.config.util.MatchUtil;
 import lombok.extern.slf4j.Slf4j;
 import net.bytebuddy.implementation.bind.annotation.Origin;
 import net.bytebuddy.implementation.bind.annotation.RuntimeType;
@@ -20,16 +21,29 @@ public class TraceInterceptor {
 
     @RuntimeType
     public static <T> T interceptor(@Origin Method method, @SuperCall Callable<T> callable) throws Exception {
-        // 未启用时，直接返回，不做任何处理
+        // 全局未启用时，直接返回，不做任何处理
+        if (!TraceMasterContext.isGlobalEnable()) {
+            return callable.call();
+        }
+
+        // 类名及方法名不匹配，直接返回，不做任何处理
+        Class<?> klz = method.getDeclaringClass();
+        String klzName = klz.getName();
+        String methodName = method.getName();
+        if (!MatchUtil.classMatch(klzName) || !MatchUtil.methodMatch(methodName)) {
+            return callable.call();
+        }
+
+        // 未执行到入口的，直接返回，不做任何处理
         if (!TraceMasterContext.isEnable()) {
             return callable.call();
         }
 
-        Class<?> klz = method.getDeclaringClass();
-
+        // TODO 执行前置
         try {
             return callable.call();
         } finally {
+            // TODO 执行后置
         }
     }
 

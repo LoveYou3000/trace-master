@@ -17,4 +17,6 @@ public class TraceMasterAgentConfig {
 
     private Set<String> excludePackages;
 
+    private Set<String> methodEntrances;
+
 }

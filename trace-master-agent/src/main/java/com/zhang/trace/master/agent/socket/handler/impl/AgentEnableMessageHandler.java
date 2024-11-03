@@ -15,7 +15,7 @@ public class AgentEnableMessageHandler implements ServerMessageHandler<AgentEnab
 
     @Override
     public void handle(AgentEnableMessage data, AgentSocketClient session) {
-        TraceMasterContext.setEnable(data.getEnable());
+        TraceMasterContext.setIsGlobalEnable(data.getEnable());
     }
 
 }
