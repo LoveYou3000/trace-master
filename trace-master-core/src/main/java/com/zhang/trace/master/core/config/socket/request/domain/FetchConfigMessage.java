@@ -3,6 +3,7 @@ package com.zhang.trace.master.core.config.socket.request.domain;
 import com.zhang.trace.master.core.config.TraceMasterAgentConfig;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
+import lombok.ToString;
 
 /**
  * 拉取配置消息
@@ -12,6 +13,7 @@ import lombok.EqualsAndHashCode;
  */
 @Data
 @EqualsAndHashCode(callSuper = true)
+@ToString(callSuper = true)
 public class FetchConfigMessage extends BaseSocketMessage {
 
     /**

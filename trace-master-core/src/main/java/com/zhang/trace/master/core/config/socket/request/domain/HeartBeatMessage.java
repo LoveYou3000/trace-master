@@ -12,6 +12,7 @@ import lombok.ToString;
  */
 @Data
 @EqualsAndHashCode(callSuper = true)
+@ToString(callSuper = true)
 public class HeartBeatMessage extends BaseSocketMessage {
 
     /**

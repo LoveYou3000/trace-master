@@ -11,10 +11,8 @@
 
     <modules>
         <module>trace-master-agent</module>
-        <module>trace-master-spring-agent</module>
         <module>trace-master-core</module>
         <module>trace-master-server</module>
-        <module>trace-master-test</module>
     </modules>
 
     <properties>

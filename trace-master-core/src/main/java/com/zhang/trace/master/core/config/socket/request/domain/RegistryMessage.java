@@ -2,6 +2,7 @@ package com.zhang.trace.master.core.config.socket.request.domain;
 
 import lombok.Data;
 import lombok.EqualsAndHashCode;
+import lombok.ToString;
 
 /**
  * 注册消息
@@ -11,5 +12,6 @@ import lombok.EqualsAndHashCode;
  */
 @Data
 @EqualsAndHashCode(callSuper = true)
+@ToString(callSuper = true)
 public class RegistryMessage extends BaseSocketMessage {
 }

@@ -22,6 +22,7 @@ public class RegisterRequestHandler implements AgentRequestHandler<RegistryMessa
 
     @Override
     public void handle(RegistryMessage registryRequest, WebSocketSession session) {
+        log.info("收到注册消息:{}", registryRequest);
         RegistryResultMessage registryResultRequest = new RegistryResultMessage();
         String instanceId = UUID.randomUUID().toString();
         registryResultRequest.setAppId(registryRequest.getAppId());

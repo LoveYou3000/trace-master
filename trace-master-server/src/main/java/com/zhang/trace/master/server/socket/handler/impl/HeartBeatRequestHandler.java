@@ -25,6 +25,7 @@ public class HeartBeatRequestHandler implements AgentRequestHandler<HeartBeatMes
 
     @Override
     public void handle(HeartBeatMessage heartBeatRequest, WebSocketSession session) {
+        log.debug("收到心跳消息:{}", heartBeatRequest);
         if (!Objects.equals(PING, heartBeatRequest.getPing())) {
             throw new RuntimeException("wrong heartbeat data:" + heartBeatRequest.getPing());
         }
