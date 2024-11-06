@@ -80,19 +80,11 @@ public class TraceMasterAgent {
     }
 
     private static ElementMatcher.Junction<? super MethodDescription> methodMatcher(TypeDescription typeDescription) {
-        return ElementMatchers.not(
-                        ElementMatchers.isMain()
-                                .or(ElementMatchers.isGetter())
-                                .or(ElementMatchers.isSetter())
-                                .or(ElementMatchers.isClone())
-                )
-                .and(ElementMatchers.isDeclaredBy(typeDescription));
+        return ElementMatchers.isDeclaredBy(typeDescription);
     }
 
     private static ElementMatcher.Junction<? super TypeDescription> classMatcher() {
-        return ElementMatchers.not(
-                ElementMatchers.isAnnotation()
-        );
+        return ElementMatchers.any();
     }
 
 }
