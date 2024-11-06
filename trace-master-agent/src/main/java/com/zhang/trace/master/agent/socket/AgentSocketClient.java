@@ -1,5 +1,6 @@
 package com.zhang.trace.master.agent.socket;
 
+import com.zhang.trace.master.agent.interceptor.context.TraceMasterContext;
 import com.zhang.trace.master.agent.socket.handler.ServerMessageHandler;
 import com.zhang.trace.master.core.config.TraceMasterAgentConfig;
 import com.zhang.trace.master.core.config.socket.request.SocketMessage;
@@ -9,6 +10,7 @@ import com.zhang.trace.master.core.config.socket.request.domain.RegistryMessage;
 import com.zhang.trace.master.core.config.socket.request.domain.UnRegistryMessage;
 import com.zhang.trace.master.core.config.util.JacksonUtil;
 import com.zhang.trace.master.core.config.util.NamedThreadFactory;
+import io.opentracing.mock.MockSpan;
 import lombok.Setter;
 import lombok.extern.slf4j.Slf4j;
 import org.java_websocket.client.WebSocketClient;
@@ -16,6 +18,7 @@ import org.java_websocket.handshake.ServerHandshake;
 
 import java.net.URI;
 import java.util.Collections;
+import java.util.List;
 import java.util.concurrent.ArrayBlockingQueue;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.ThreadPoolExecutor;
@@ -50,6 +53,7 @@ public class AgentSocketClient extends WebSocketClient {
     @Override
     public void onOpen(ServerHandshake serverHandshake) {
         register();
+        fetchConfig();
         heartbeat();
         Runtime.getRuntime().addShutdownHook(new Thread(() -> {
             unRegister();
@@ -123,10 +127,15 @@ public class AgentSocketClient extends WebSocketClient {
         });
     }
 
-    public TraceMasterAgentConfig fetchConfig() {
+    public void fetchConfig() {
         TraceMasterAgentConfig config = new TraceMasterAgentConfig();
         config.setIncludePackages(Collections.singleton("com.zhang.test.trace"));
-        return config;
+        config.setMethodEntrances(Collections.singleton("com.zhang.test.trace.runner.PreheatRunner.run"));
+        TraceMasterContext.setTraceMasterAgentConfig(config);
+    }
+
+    public void uploadFinishedSpans(List<MockSpan> finishedSpans) {
+        log.info(finishedSpans.toString());
     }
 
 }

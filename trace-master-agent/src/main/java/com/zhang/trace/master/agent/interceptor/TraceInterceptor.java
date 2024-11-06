@@ -3,8 +3,8 @@ package com.zhang.trace.master.agent.interceptor;
 import com.zhang.trace.master.agent.interceptor.context.TraceMasterContext;
 import com.zhang.trace.master.core.config.TraceMasterAgentConfig;
 import com.zhang.trace.master.core.config.util.MatchUtil;
-import io.opentracing.Span;
-import io.opentracing.Tracer;
+import io.opentracing.mock.MockSpan;
+import io.opentracing.mock.MockTracer;
 import lombok.extern.slf4j.Slf4j;
 import net.bytebuddy.implementation.bind.annotation.Origin;
 import net.bytebuddy.implementation.bind.annotation.RuntimeType;
@@ -12,6 +12,7 @@ import net.bytebuddy.implementation.bind.annotation.SuperCall;
 
 import java.lang.reflect.Method;
 import java.util.Arrays;
+import java.util.List;
 import java.util.Objects;
 import java.util.concurrent.Callable;
 import java.util.stream.Collectors;
@@ -53,14 +54,14 @@ public class TraceInterceptor {
         }
 
         // 执行前置
-        Tracer tracer = TraceMasterContext.getTracer();
-        Tracer.SpanBuilder spanBuilder = tracer.buildSpan(String.format("%s.%s(%s)", klzName, methodName, argTypes));
-        Span parentSpan = TraceMasterContext.getSpan();
+        MockTracer tracer = TraceMasterContext.getTracer();
+        MockTracer.SpanBuilder spanBuilder = tracer.buildSpan(String.format("%s.%s(%s)", klzName, methodName, argTypes));
+        MockSpan parentSpan = TraceMasterContext.getSpan();
         if (Objects.nonNull(parentSpan)) {
             // 设置父子关系
             spanBuilder.asChildOf(parentSpan);
         }
-        Span span = spanBuilder.start();
+        MockSpan span = spanBuilder.start();
         TraceMasterContext.setSpan(span);
         try {
             return callable.call();
@@ -68,7 +69,8 @@ public class TraceInterceptor {
             // 执行后置
             span.finish();
             if (Objects.isNull(parentSpan)) {
-                // TODO 上传链路数据
+                List<MockSpan> finishedSpans = tracer.finishedSpans();
+                TraceMasterContext.getAgentSocketClient().uploadFinishedSpans(finishedSpans);
                 tracer.close();
                 TraceMasterContext.clear();
             } else {

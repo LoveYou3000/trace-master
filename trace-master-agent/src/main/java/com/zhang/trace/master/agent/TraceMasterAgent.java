@@ -84,7 +84,8 @@ public class TraceMasterAgent {
     }
 
     private static ElementMatcher.Junction<? super TypeDescription> classMatcher() {
-        return ElementMatchers.any();
+        return ElementMatchers.not(ElementMatchers.isAnnotation())
+                .and(ElementMatchers.not(ElementMatchers.nameStartsWith("com.zhang.trace.master")));
     }
 
 }

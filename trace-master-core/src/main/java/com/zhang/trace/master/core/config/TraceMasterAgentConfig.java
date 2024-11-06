@@ -2,6 +2,7 @@ package com.zhang.trace.master.core.config;
 
 import lombok.Data;
 
+import java.util.HashSet;
 import java.util.Set;
 
 /**
@@ -13,10 +14,10 @@ import java.util.Set;
 @Data
 public class TraceMasterAgentConfig {
 
-    private Set<String> includePackages;
+    private Set<String> includePackages = new HashSet<>();
 
-    private Set<String> excludePackages;
+    private Set<String> excludePackages = new HashSet<>();
 
-    private Set<String> methodEntrances;
+    private Set<String> methodEntrances = new HashSet<>();
 
 }

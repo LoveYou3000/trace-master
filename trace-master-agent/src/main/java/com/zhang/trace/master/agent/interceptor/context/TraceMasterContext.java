@@ -3,8 +3,7 @@ package com.zhang.trace.master.agent.interceptor.context;
 import com.alibaba.ttl.TransmittableThreadLocal;
 import com.zhang.trace.master.agent.socket.AgentSocketClient;
 import com.zhang.trace.master.core.config.TraceMasterAgentConfig;
-import io.opentracing.Span;
-import io.opentracing.Tracer;
+import io.opentracing.mock.MockSpan;
 import io.opentracing.mock.MockTracer;
 import lombok.Getter;
 import lombok.Setter;
@@ -62,27 +61,27 @@ public class TraceMasterContext {
     /**
      * span
      */
-    private static final ThreadLocal<Span> SPAN = new TransmittableThreadLocal<>();
+    private static final ThreadLocal<MockSpan> SPAN = new TransmittableThreadLocal<>();
 
-    public static Span getSpan() {
+    public static MockSpan getSpan() {
         return SPAN.get();
     }
 
-    public static void setSpan(Span span) {
+    public static void setSpan(MockSpan span) {
         SPAN.set(span);
     }
 
     /**
      * tracer
      */
-    private static final ThreadLocal<Tracer> TRACER = new TransmittableThreadLocal<>() {
+    private static final ThreadLocal<MockTracer> TRACER = new TransmittableThreadLocal<>() {
         @Override
-        protected Tracer initialValue() {
+        protected MockTracer initialValue() {
             return new MockTracer();
         }
     };
 
-    public static Tracer getTracer() {
+    public static MockTracer getTracer() {
         return TRACER.get();
     }
 
