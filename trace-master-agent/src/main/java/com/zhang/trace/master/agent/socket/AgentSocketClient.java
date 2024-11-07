@@ -1,5 +1,6 @@
 package com.zhang.trace.master.agent.socket;
 
+import cn.hutool.core.thread.ThreadUtil;
 import com.zhang.trace.master.agent.interceptor.context.TraceMasterContext;
 import com.zhang.trace.master.agent.socket.handler.ServerMessageHandler;
 import com.zhang.trace.master.core.config.TraceMasterAgentConfig;
@@ -54,7 +55,6 @@ public class AgentSocketClient extends WebSocketClient {
     public void onOpen(ServerHandshake serverHandshake) {
         register();
         fetchConfig();
-        heartbeat();
         Runtime.getRuntime().addShutdownHook(new Thread(() -> {
             unRegister();
             this.close();
@@ -100,31 +100,17 @@ public class AgentSocketClient extends WebSocketClient {
         send(agentMessage);
     }
 
-    private void heartbeat() {
-        HEARTBEAT_EXECUTOR.execute(() -> {
-            try {
-                TimeUnit.SECONDS.sleep(10);
-            } catch (InterruptedException e) {
-                throw new RuntimeException(e);
-            }
+    public void heartbeat() {
+        ThreadUtil.sleep(10, TimeUnit.SECONDS);
 
-            while (true) {
-                HeartBeatMessage heartBeatRequest = new HeartBeatMessage();
-                heartBeatRequest.setPing(PING);
-                heartBeatRequest.setAppId(appId);
-                heartBeatRequest.setInstanceId(instanceId);
+        HeartBeatMessage heartBeatRequest = new HeartBeatMessage();
+        heartBeatRequest.setPing(PING);
+        heartBeatRequest.setAppId(appId);
+        heartBeatRequest.setInstanceId(instanceId);
 
-                SocketMessage<HeartBeatMessage> agentMessage = new SocketMessage<>(heartBeatRequest, SocketMessageType.HEARTBEAT);
+        SocketMessage<HeartBeatMessage> agentMessage = new SocketMessage<>(heartBeatRequest, SocketMessageType.HEARTBEAT);
 
-                send(agentMessage);
-
-                try {
-                    TimeUnit.SECONDS.sleep(10);
-                } catch (InterruptedException e) {
-                    throw new RuntimeException(e);
-                }
-            }
-        });
+        send(agentMessage);
     }
 
     public void fetchConfig() {

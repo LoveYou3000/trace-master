@@ -19,6 +19,9 @@ public class RegistryResultMessageHandler implements ServerMessageHandler<Regist
             throw new RuntimeException("注册失败，请检查 server 端状态");
         }
         session.setInstanceId(instanceId);
+
+        // 向 server 发送心跳
+        session.heartbeat();
     }
 
 }

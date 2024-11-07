@@ -34,11 +34,8 @@ public class TraceMasterContext {
      * 全局启用标识
      */
     @Setter
-    private static Boolean isGlobalEnable;
-
-    public static boolean isGlobalEnable() {
-        return Boolean.TRUE.equals(isGlobalEnable);
-    }
+    @Getter
+    private static boolean isGlobalEnable = true;
 
     /**
      * 方法级入口标识

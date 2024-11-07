@@ -20,4 +20,6 @@ public class TraceMasterAgentConfig {
 
     private Set<String> methodEntrances = new HashSet<>();
 
+    private Long lastUpdate;
+
 }

@@ -1,6 +1,7 @@
 package com.zhang.trace.master.agent.socket.handler;
 
 import com.zhang.trace.master.agent.socket.AgentSocketClient;
+import com.zhang.trace.master.agent.socket.handler.impl.AgentEnableMessageHandler;
 import com.zhang.trace.master.agent.socket.handler.impl.ConfigUpdatedMessageHandler;
 import com.zhang.trace.master.agent.socket.handler.impl.HeartBeatMessageHandler;
 import com.zhang.trace.master.agent.socket.handler.impl.RegistryResultMessageHandler;
@@ -41,6 +42,9 @@ public interface ServerMessageHandler<T> {
             }
             case CONFIG_UPDATED -> {
                 return new ConfigUpdatedMessageHandler();
+            }
+            case AGENT_ENABLE -> {
+                return new AgentEnableMessageHandler();
             }
             default -> throw new RuntimeException("未适配的请求类型:" + serverMessageType);
         }
