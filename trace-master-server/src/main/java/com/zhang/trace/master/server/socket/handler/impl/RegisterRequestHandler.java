@@ -31,7 +31,7 @@ public class RegisterRequestHandler implements AgentRequestHandler<RegistryMessa
         SocketMessage<RegistryResultMessage> serverMessage = new SocketMessage<>(registryResultRequest, SocketMessageType.REGISTRY_RESULT);
 
         WebSocketSessionManager.saveSession(registryRequest.getAppId(), instanceId, session);
-        WebSocketSessionManager.sendMessage(registryRequest.getAppId(), instanceId, serverMessage);
+        WebSocketSessionManager.sendMessage(session, serverMessage);
     }
 
 }

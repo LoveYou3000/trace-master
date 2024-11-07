@@ -52,7 +52,7 @@ public class TraceMasterAgent {
         // 设置需要进行增强的类
         ElementMatcher.Junction<? super TypeDescription> classMatcher = classMatcher();
 
-        // 设置了 main 方法，get/set 方法不进行增强
+        // 设置了只增强自身类实现的方法，不增强父类的方法
         AgentBuilder.Transformer transformer = (builder, typeDescription, classLoader, javaModule, protectionDomain) -> builder.method(methodMatcher(typeDescription)).intercept(MethodDelegation.to(TraceInterceptor.class));
 
         // 监听器无操作

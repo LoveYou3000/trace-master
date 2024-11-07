@@ -56,7 +56,7 @@ public class TraceMasterContext {
     }
 
     /**
-     * span
+     * 当前执行的span
      */
     private static final ThreadLocal<MockSpan> SPAN = new TransmittableThreadLocal<>();
 
@@ -69,7 +69,7 @@ public class TraceMasterContext {
     }
 
     /**
-     * tracer
+     * 当次链路的tracer
      */
     private static final ThreadLocal<MockTracer> TRACER = new TransmittableThreadLocal<>() {
         @Override
@@ -82,6 +82,9 @@ public class TraceMasterContext {
         return TRACER.get();
     }
 
+    /**
+     * 清空 ThreadLocal 中的信息
+     */
     public static void clear() {
         ENABLE.remove();
         SPAN.remove();

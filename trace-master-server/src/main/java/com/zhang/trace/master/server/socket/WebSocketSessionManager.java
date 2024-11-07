@@ -52,7 +52,8 @@ public class WebSocketSessionManager {
      * @return appId 对应的会话
      */
     public static List<WebSocketSession> getSessions(@NonNull String appId) {
-        Collection<WebSocketSession> sessions = SESSION_HOLDER.getOrDefault(appId, new ConcurrentHashMap<>(MAP_INIT_SIZE)).values();
+        checkAppId(appId);
+        Collection<WebSocketSession> sessions = SESSION_HOLDER.get(appId).values();
         return List.copyOf(sessions);
     }
 
@@ -64,7 +65,8 @@ public class WebSocketSessionManager {
      * @return appId 对应的会话
      */
     public static WebSocketSession getSession(@NonNull String appId, @NonNull String instanceId) {
-        return SESSION_HOLDER.getOrDefault(appId, new ConcurrentHashMap<>(MAP_INIT_SIZE)).get(instanceId);
+        checkAppIdAndInstanceId(appId, instanceId);
+        return SESSION_HOLDER.get(appId).get(instanceId);
     }
 
     /**
@@ -75,9 +77,9 @@ public class WebSocketSessionManager {
      */
     @SneakyThrows(IOException.class)
     public static void removeSession(@NonNull String appId, @NonNull String instanceId) {
-        Map<String, WebSocketSession> sessions = SESSION_HOLDER.getOrDefault(appId, new ConcurrentHashMap<>(MAP_INIT_SIZE));
-        sessions.remove(instanceId).close();
-        SESSION_HOLDER.put(appId, sessions);
+        checkAppIdAndInstanceId(appId, instanceId);
+        WebSocketSession removedSession = SESSION_HOLDER.get(appId).remove(instanceId);
+        removedSession.close();
     }
 
     /**
@@ -128,7 +130,7 @@ public class WebSocketSessionManager {
      * @param serverMessage 要发送的消息实体类
      */
     public static void sendMessage(@NonNull String appId, @NonNull String instanceId, @NonNull SocketMessage<? extends BaseSocketMessage> serverMessage) {
-        sendMessage(SESSION_HOLDER.getOrDefault(appId, new ConcurrentHashMap<>(MAP_INIT_SIZE)).get(instanceId), serverMessage);
+        sendMessage(getSession(appId, instanceId), serverMessage);
     }
 
     /**
@@ -139,7 +141,7 @@ public class WebSocketSessionManager {
      * @param message    要发送的消息
      */
     public static void sendMessage(@NonNull String appId, @NonNull String instanceId, @NonNull String message) {
-        sendMessage(SESSION_HOLDER.getOrDefault(appId, new ConcurrentHashMap<>(MAP_INIT_SIZE)).get(instanceId), message);
+        sendMessage(getSession(appId, instanceId), message);
     }
 
     /**
@@ -182,6 +184,19 @@ public class WebSocketSessionManager {
     @SneakyThrows(IOException.class)
     public static void sendMessage(@NonNull WebSocketSession session, @NonNull TextMessage message) {
         session.sendMessage(message);
+    }
+
+    private static void checkAppId(String appId) {
+        if (!SESSION_HOLDER.containsKey(appId)) {
+            throw new RuntimeException("appId:'" + appId + "'未找到会话");
+        }
+    }
+
+    private static void checkAppIdAndInstanceId(String appId, String instanceId) {
+        checkAppId(appId);
+        if (!SESSION_HOLDER.get(appId).containsKey(instanceId)) {
+            throw new RuntimeException("appId:'" + appId + "', instanceId:'" + instanceId + "'未找到会话");
+        }
     }
 
 }

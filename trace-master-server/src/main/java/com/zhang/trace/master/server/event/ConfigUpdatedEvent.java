@@ -3,6 +3,8 @@ package com.zhang.trace.master.server.event;
 import lombok.Getter;
 import org.springframework.context.ApplicationEvent;
 
+import java.time.Instant;
+
 /**
  * 配置已更新事件
  *
@@ -16,10 +18,10 @@ public class ConfigUpdatedEvent extends ApplicationEvent {
 
     private final Long lastUpdate;
 
-    public ConfigUpdatedEvent(Object source, String appId, Long lastUpdate) {
+    public ConfigUpdatedEvent(Object source, String appId) {
         super(source);
         this.appId = appId;
-        this.lastUpdate = lastUpdate;
+        this.lastUpdate = Instant.now().toEpochMilli();
     }
 
 }

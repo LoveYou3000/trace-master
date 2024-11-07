@@ -34,7 +34,7 @@ public class HeartBeatRequestHandler implements AgentRequestHandler<HeartBeatMes
 
         SocketMessage<HeartBeatMessage> serverMessage = new SocketMessage<>(heartBeatResponse, SocketMessageType.HEARTBEAT_RESULT);
 
-        WebSocketSessionManager.sendMessage(heartBeatRequest.getAppId(), heartBeatRequest.getInstanceId(), serverMessage);
+        WebSocketSessionManager.sendMessage(session, serverMessage);
     }
 
 }

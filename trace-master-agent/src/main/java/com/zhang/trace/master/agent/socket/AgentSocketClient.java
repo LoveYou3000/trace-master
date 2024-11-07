@@ -6,6 +6,7 @@ import com.zhang.trace.master.agent.socket.handler.ServerMessageHandler;
 import com.zhang.trace.master.core.config.TraceMasterAgentConfig;
 import com.zhang.trace.master.core.config.socket.request.SocketMessage;
 import com.zhang.trace.master.core.config.socket.request.SocketMessageType;
+import com.zhang.trace.master.core.config.socket.request.domain.BaseSocketMessage;
 import com.zhang.trace.master.core.config.socket.request.domain.HeartBeatMessage;
 import com.zhang.trace.master.core.config.socket.request.domain.RegistryMessage;
 import com.zhang.trace.master.core.config.socket.request.domain.UnRegistryMessage;
@@ -35,11 +36,6 @@ import java.util.concurrent.TimeUnit;
 public class AgentSocketClient extends WebSocketClient {
 
     private static final String PING = "ping";
-
-    private final ExecutorService HEARTBEAT_EXECUTOR = new ThreadPoolExecutor(1, 1, 0, TimeUnit.SECONDS,
-            new ArrayBlockingQueue<>(1),
-            new NamedThreadFactory("heartbeat-"),
-            new ThreadPoolExecutor.AbortPolicy());
 
     private final String appId;
 
@@ -77,6 +73,12 @@ public class AgentSocketClient extends WebSocketClient {
 
     }
 
+    private void send(BaseSocketMessage agentMessage, SocketMessageType socketMessageType) {
+        SocketMessage<?> message = new SocketMessage<>(agentMessage, socketMessageType);
+
+        send(JacksonUtil.toJsonString(message));
+    }
+
     private void send(SocketMessage<?> agentMessage) {
         send(JacksonUtil.toJsonString(agentMessage));
     }
@@ -85,9 +87,7 @@ public class AgentSocketClient extends WebSocketClient {
         RegistryMessage registryRequest = new RegistryMessage();
         registryRequest.setAppId(appId);
 
-        SocketMessage<RegistryMessage> agentMessage = new SocketMessage<>(registryRequest, SocketMessageType.REGISTER);
-
-        send(agentMessage);
+        send(registryRequest, SocketMessageType.REGISTER);
     }
 
     private void unRegister() {
@@ -95,22 +95,18 @@ public class AgentSocketClient extends WebSocketClient {
         unRegistryRequest.setAppId(appId);
         unRegistryRequest.setInstanceId(instanceId);
 
-        SocketMessage<UnRegistryMessage> agentMessage = new SocketMessage<>(unRegistryRequest, SocketMessageType.UNREGISTER);
-
-        send(agentMessage);
+        send(unRegistryRequest, SocketMessageType.UNREGISTER);
     }
 
     public void heartbeat() {
         ThreadUtil.sleep(10, TimeUnit.SECONDS);
 
         HeartBeatMessage heartBeatRequest = new HeartBeatMessage();
-        heartBeatRequest.setPing(PING);
         heartBeatRequest.setAppId(appId);
         heartBeatRequest.setInstanceId(instanceId);
+        heartBeatRequest.setPing(PING);
 
-        SocketMessage<HeartBeatMessage> agentMessage = new SocketMessage<>(heartBeatRequest, SocketMessageType.HEARTBEAT);
-
-        send(agentMessage);
+        send(heartBeatRequest, SocketMessageType.HEARTBEAT);
     }
 
     public void fetchConfig() {

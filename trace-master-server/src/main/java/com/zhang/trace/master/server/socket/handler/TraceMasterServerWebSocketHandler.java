@@ -20,4 +20,5 @@ public class TraceMasterServerWebSocketHandler extends TextWebSocketHandler {
         SocketMessage<?> agentMessage = JacksonUtil.parseObj(message.getPayload(), SocketMessage.class);
         AgentRequestHandler.getAgentRequestHandler(agentMessage.type()).handleMessage(agentMessage.data(), session);
     }
+
 }
