@@ -15,9 +15,6 @@ import lombok.ToString;
 @ToString(callSuper = true)
 public class HeartBeatMessage extends BaseSocketMessage {
 
-    /**
-     * 心跳
-     */
     private String ping;
 
     private String pong;

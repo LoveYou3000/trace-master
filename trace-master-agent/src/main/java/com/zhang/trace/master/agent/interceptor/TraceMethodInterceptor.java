@@ -18,13 +18,13 @@ import java.util.concurrent.Callable;
 import java.util.stream.Collectors;
 
 /**
- * trace master 字节码增强
+ * trace master 方法增强
  *
  * @author zhang
  * @date 2024-10-24 09:23
  */
 @Slf4j
-public class TraceInterceptor {
+public class TraceMethodInterceptor {
 
     @RuntimeType
     public static <T> T interceptor(@Origin Method method, @SuperCall Callable<T> callable) throws Exception {

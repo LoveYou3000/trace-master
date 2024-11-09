@@ -50,7 +50,7 @@ public class MatchUtil {
      * @return 是否为入口
      */
     public static boolean entranceMatch(String klzName, String methodName, TraceMasterAgentConfig config) {
-        String entrance = klzName + "." + methodName;
+        String entrance = klzName + "#" + methodName;
         return config.getMethodEntrances().contains(entrance);
     }
 }

@@ -11,7 +11,6 @@ import com.zhang.trace.master.core.config.socket.request.domain.HeartBeatMessage
 import com.zhang.trace.master.core.config.socket.request.domain.RegistryMessage;
 import com.zhang.trace.master.core.config.socket.request.domain.UnRegistryMessage;
 import com.zhang.trace.master.core.config.util.JacksonUtil;
-import com.zhang.trace.master.core.config.util.NamedThreadFactory;
 import io.opentracing.mock.MockSpan;
 import lombok.Setter;
 import lombok.extern.slf4j.Slf4j;
@@ -19,11 +18,9 @@ import org.java_websocket.client.WebSocketClient;
 import org.java_websocket.handshake.ServerHandshake;
 
 import java.net.URI;
-import java.util.Collections;
+import java.util.HashSet;
 import java.util.List;
-import java.util.concurrent.ArrayBlockingQueue;
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.ThreadPoolExecutor;
+import java.util.Set;
 import java.util.concurrent.TimeUnit;
 
 /**
@@ -76,10 +73,11 @@ public class AgentSocketClient extends WebSocketClient {
     private void send(BaseSocketMessage agentMessage, SocketMessageType socketMessageType) {
         SocketMessage<?> message = new SocketMessage<>(agentMessage, socketMessageType);
 
-        send(JacksonUtil.toJsonString(message));
+        send(message);
     }
 
     private void send(SocketMessage<?> agentMessage) {
+        log.info("发送消息，类型:{}，消息体:{}", agentMessage.type(), agentMessage.data());
         send(JacksonUtil.toJsonString(agentMessage));
     }
 
@@ -111,8 +109,21 @@ public class AgentSocketClient extends WebSocketClient {
 
     public void fetchConfig() {
         TraceMasterAgentConfig config = new TraceMasterAgentConfig();
-        config.setIncludePackages(Collections.singleton("com.zhang.test.trace"));
-        config.setMethodEntrances(Collections.singleton("com.zhang.test.trace.runner.PreheatRunner.run"));
+
+        Set<String> includePackages = new HashSet<>();
+        includePackages.add("com.zhang.test.trace");
+        includePackages.add("com.ruoyi");
+
+        Set<String> excludePackages = new HashSet<>();
+
+        Set<String> methodEntrance = new HashSet<>();
+        methodEntrance.add("com.zhang.test.trace.runner.PreheatRunner#run");
+        methodEntrance.add("com.ruoyi.system.service.impl.SysConfigServiceImpl#init");
+
+        config.setIncludePackages(includePackages);
+        config.setExcludePackages(excludePackages);
+        config.setMethodEntrances(methodEntrance);
+
         TraceMasterContext.setTraceMasterAgentConfig(config);
     }
 

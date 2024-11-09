@@ -1,6 +1,6 @@
 package com.zhang.trace.master.agent;
 
-import com.zhang.trace.master.agent.interceptor.TraceInterceptor;
+import com.zhang.trace.master.agent.interceptor.TraceMethodInterceptor;
 import com.zhang.trace.master.agent.interceptor.context.TraceMasterContext;
 import com.zhang.trace.master.agent.socket.AgentSocketClient;
 import com.zhang.trace.master.core.config.util.NamedThreadFactory;
@@ -53,9 +53,13 @@ public class TraceMasterAgent {
         ElementMatcher.Junction<? super TypeDescription> classMatcher = classMatcher();
 
         // 设置了只增强自身类实现的方法，不增强父类的方法
-        AgentBuilder.Transformer transformer = (builder, typeDescription, classLoader, javaModule, protectionDomain) -> builder.method(methodMatcher(typeDescription)).intercept(MethodDelegation.to(TraceInterceptor.class));
+        AgentBuilder.Transformer transformer = (builder, typeDescription, classLoader, javaModule, protectionDomain) -> {
+            return builder
+                    .method(methodMatcher(typeDescription))
+                    .intercept(MethodDelegation.to(TraceMethodInterceptor.class));
+        };
 
-        // 监听器无操作
+        // 监听器
         AgentBuilder.Listener listener = AgentBuilder.Listener.NoOp.INSTANCE;
 
         new AgentBuilder.Default()
