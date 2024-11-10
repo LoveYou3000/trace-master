@@ -14,18 +14,18 @@ public class PreheatRunner implements CommandLineRunner {
 
     @Override
     public void run(String... args) throws Exception {
-        a();
+        a("1");
     }
 
-    private void a() {
-        b();
+    private void a(String id) {
+        b("2");
     }
 
-    private void b() {
-        c();
+    private void b(String id) {
+        c("3");
     }
 
-    private void c() {
+    private void c(String id) {
     }
 
 }

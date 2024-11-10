@@ -1,5 +1,7 @@
 package com.zhang.trace.master.agent.socket;
 
+import cn.hutool.core.net.Ipv4Util;
+import cn.hutool.core.net.NetUtil;
 import cn.hutool.core.thread.ThreadUtil;
 import com.zhang.trace.master.agent.interceptor.context.TraceMasterContext;
 import com.zhang.trace.master.agent.socket.handler.ServerMessageHandler;
@@ -19,9 +21,11 @@ import org.java_websocket.handshake.ServerHandshake;
 
 import java.net.URI;
 import java.util.HashSet;
+import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Set;
 import java.util.concurrent.TimeUnit;
+import java.util.stream.Collectors;
 
 /**
  * agent 向 server 发起会话
@@ -84,6 +88,12 @@ public class AgentSocketClient extends WebSocketClient {
     private void register() {
         RegistryMessage registryRequest = new RegistryMessage();
         registryRequest.setAppId(appId);
+        LinkedHashSet<String> localIps = NetUtil.localIpv4s();
+        String ips = localIps.stream().filter(localIp -> !Ipv4Util.LOCAL_IP.equals(localIp)).collect(Collectors.joining(","));
+        registryRequest.setIp(ips);
+        registryRequest.setStatus(TraceMasterContext.isGlobalEnable() ? 1 : 0);
+        registryRequest.setSystem(System.getProperty("os.name"));
+        registryRequest.setJavaVersion(System.getProperty("java.version"));
 
         send(registryRequest, SocketMessageType.REGISTER);
     }

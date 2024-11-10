@@ -4,6 +4,8 @@ import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.ToString;
 
+import java.time.Instant;
+
 /**
  * 注册消息
  *
@@ -14,4 +16,17 @@ import lombok.ToString;
 @EqualsAndHashCode(callSuper = true)
 @ToString(callSuper = true)
 public class RegistryMessage extends BaseSocketMessage {
+
+    private Integer id;
+
+    private String ip;
+
+    private Integer status;
+
+    private String system;
+
+    private String javaVersion;
+
+    private Long registryTime;
+
 }

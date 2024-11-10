@@ -6,6 +6,7 @@ import com.zhang.trace.master.core.config.util.MatchUtil;
 import io.opentracing.mock.MockSpan;
 import io.opentracing.mock.MockTracer;
 import lombok.extern.slf4j.Slf4j;
+import net.bytebuddy.implementation.bind.annotation.AllArguments;
 import net.bytebuddy.implementation.bind.annotation.Origin;
 import net.bytebuddy.implementation.bind.annotation.RuntimeType;
 import net.bytebuddy.implementation.bind.annotation.SuperCall;
@@ -27,7 +28,7 @@ import java.util.stream.Collectors;
 public class TraceMethodInterceptor {
 
     @RuntimeType
-    public static <T> T interceptor(@Origin Method method, @SuperCall Callable<T> callable) throws Exception {
+    public static <T> T interceptor(@Origin Method method, @AllArguments Object[] args, @SuperCall Callable<T> callable) throws Exception {
         // 全局未启用时，直接返回，不做任何处理
         if (!TraceMasterContext.isGlobalEnable()) {
             return callable.call();

@@ -17,6 +17,7 @@ import org.springframework.stereotype.Component;
 @Getter
 public class SpringContextHolder {
 
+    @Getter
     private static ApplicationContext springCtx;
 
     @Autowired
