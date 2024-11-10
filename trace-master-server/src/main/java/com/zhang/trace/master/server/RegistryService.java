@@ -7,9 +7,8 @@ import com.zhang.trace.master.core.config.socket.request.domain.RegistryMessage;
 import com.zhang.trace.master.core.config.socket.request.domain.UnRegistryMessage;
 import com.zhang.trace.master.server.domain.request.instance.ListRequest;
 import com.zhang.trace.master.server.domain.request.instance.UpdateStatusRequest;
-import com.zhang.trace.master.server.domain.response.base.Result;
-import com.zhang.trace.master.server.domain.response.instance.ListResponse;
 import com.zhang.trace.master.server.domain.response.base.ResultPage;
+import com.zhang.trace.master.server.domain.response.instance.ListResponse;
 import com.zhang.trace.master.server.socket.WebSocketSessionManager;
 import lombok.Getter;
 import org.springframework.beans.BeanUtils;
@@ -42,6 +41,11 @@ public class RegistryService {
     @Getter
     private final List<RegistryMessage> registryMessages = new CopyOnWriteArrayList<>();
 
+    /**
+     * 注册
+     *
+     * @param registryMessage 注册的消息
+     */
     public void registry(RegistryMessage registryMessage) {
         int id = registryId.getAndIncrement();
         registryMessage.setId(id);
@@ -50,11 +54,22 @@ public class RegistryService {
         registryMessages.add(registryMessage);
     }
 
+    /**
+     * 反注册
+     *
+     * @param unRegistryMessage 反注册的消息
+     */
     public void unRegistry(UnRegistryMessage unRegistryMessage) {
         registryMessages.removeIf(registryMessage -> Objects.equals(registryMessage.getAppId(), unRegistryMessage.getAppId()) &&
                 Objects.equals(registryMessage.getInstanceId(), unRegistryMessage.getInstanceId()));
     }
 
+    /**
+     * 分页查询
+     *
+     * @param listRequest 分页查询请求
+     * @return 分页查询结果
+     */
     public ResultPage<ListResponse> list(ListRequest listRequest) {
         List<ListResponse> totalList = registryMessages
                 .stream()
@@ -88,6 +103,11 @@ public class RegistryService {
                 .build();
     }
 
+    /**
+     * 更新状态
+     *
+     * @param updateStatusRequest 更新状态请求
+     */
     public void updateStatus(UpdateStatusRequest updateStatusRequest) {
         AgentEnableMessage agentEnableMessage = new AgentEnableMessage();
         agentEnableMessage.setAppId(updateStatusRequest.getAppId());
@@ -99,7 +119,8 @@ public class RegistryService {
         WebSocketSessionManager.sendMessage(updateStatusRequest.getAppId(), updateStatusRequest.getInstanceId(), socketMessage);
 
         registryMessages.stream().filter(registryMessage -> {
-            return Objects.equals(registryMessage.getAppId(), updateStatusRequest.getAppId()) && Objects.equals(registryMessage.getInstanceId(), updateStatusRequest.getInstanceId());
+            return Objects.equals(registryMessage.getAppId(), updateStatusRequest.getAppId()) &&
+                    Objects.equals(registryMessage.getInstanceId(), updateStatusRequest.getInstanceId());
         }).forEach(registryMessage -> registryMessage.setStatus(updateStatusRequest.getStatus()));
     }
 
