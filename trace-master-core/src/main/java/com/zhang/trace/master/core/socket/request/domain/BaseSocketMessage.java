@@ -1,4 +1,4 @@
-package com.zhang.trace.master.core.config.socket.request.domain;
+package com.zhang.trace.master.core.socket.request.domain;
 
 import lombok.Data;
 

@@ -1,10 +1,8 @@
-package com.zhang.trace.master.core.config.socket.request.domain;
+package com.zhang.trace.master.core.socket.request.domain;
 
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.ToString;
-
-import java.time.Instant;
 
 /**
  * 注册消息

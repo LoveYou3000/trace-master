@@ -1,12 +1,12 @@
-package com.zhang.trace.master.core.config.socket.request;
+package com.zhang.trace.master.core.socket.request;
 
 import com.fasterxml.jackson.core.JacksonException;
 import com.fasterxml.jackson.core.JsonParser;
 import com.fasterxml.jackson.databind.DeserializationContext;
 import com.fasterxml.jackson.databind.JsonDeserializer;
 import com.fasterxml.jackson.databind.JsonNode;
-import com.zhang.trace.master.core.config.socket.request.domain.BaseSocketMessage;
-import com.zhang.trace.master.core.config.util.JacksonUtil;
+import com.zhang.trace.master.core.socket.request.domain.BaseSocketMessage;
+import com.zhang.trace.master.core.util.JacksonUtil;
 
 import java.io.IOException;
 

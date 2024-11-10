@@ -3,7 +3,7 @@ package com.zhang.trace.master.agent;
 import com.zhang.trace.master.agent.interceptor.TraceMethodInterceptor;
 import com.zhang.trace.master.agent.interceptor.context.TraceMasterContext;
 import com.zhang.trace.master.agent.socket.AgentSocketClient;
-import com.zhang.trace.master.core.config.util.NamedThreadFactory;
+import com.zhang.trace.master.core.util.NamedThreadFactory;
 import lombok.SneakyThrows;
 import lombok.extern.slf4j.Slf4j;
 import net.bytebuddy.agent.builder.AgentBuilder;

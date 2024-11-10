@@ -1,8 +1,8 @@
 package com.zhang.trace.master.server.socket;
 
-import com.zhang.trace.master.core.config.socket.request.SocketMessage;
-import com.zhang.trace.master.core.config.socket.request.domain.BaseSocketMessage;
-import com.zhang.trace.master.core.config.util.JacksonUtil;
+import com.zhang.trace.master.core.socket.request.SocketMessage;
+import com.zhang.trace.master.core.socket.request.domain.BaseSocketMessage;
+import com.zhang.trace.master.core.util.JacksonUtil;
 import lombok.NonNull;
 import lombok.SneakyThrows;
 import lombok.extern.slf4j.Slf4j;

@@ -1,12 +1,12 @@
 package com.zhang.trace.master.server.socket.handler.impl;
 
-import com.zhang.trace.master.core.config.socket.request.SocketMessage;
-import com.zhang.trace.master.core.config.socket.request.SocketMessageType;
-import com.zhang.trace.master.core.config.socket.request.domain.RegistryResultMessage;
+import com.zhang.trace.master.core.socket.request.SocketMessage;
+import com.zhang.trace.master.core.socket.request.SocketMessageType;
+import com.zhang.trace.master.core.socket.request.domain.RegistryResultMessage;
 import com.zhang.trace.master.server.RegistryService;
 import com.zhang.trace.master.server.socket.WebSocketSessionManager;
 import com.zhang.trace.master.server.socket.handler.AgentRequestHandler;
-import com.zhang.trace.master.core.config.socket.request.domain.RegistryMessage;
+import com.zhang.trace.master.core.socket.request.domain.RegistryMessage;
 import com.zhang.trace.master.server.utils.SpringContextHolder;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.web.socket.WebSocketSession;

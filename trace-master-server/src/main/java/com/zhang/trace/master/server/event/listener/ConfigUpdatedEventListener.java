@@ -1,8 +1,8 @@
 package com.zhang.trace.master.server.event.listener;
 
-import com.zhang.trace.master.core.config.socket.request.SocketMessage;
-import com.zhang.trace.master.core.config.socket.request.SocketMessageType;
-import com.zhang.trace.master.core.config.socket.request.domain.ConfigUpdatedMessage;
+import com.zhang.trace.master.core.socket.request.SocketMessage;
+import com.zhang.trace.master.core.socket.request.SocketMessageType;
+import com.zhang.trace.master.core.socket.request.domain.ConfigUpdatedMessage;
 import com.zhang.trace.master.server.event.ConfigUpdatedEvent;
 import com.zhang.trace.master.server.socket.WebSocketSessionManager;
 import lombok.NonNull;

@@ -5,7 +5,7 @@ import com.zhang.trace.master.agent.socket.handler.impl.AgentEnableMessageHandle
 import com.zhang.trace.master.agent.socket.handler.impl.ConfigUpdatedMessageHandler;
 import com.zhang.trace.master.agent.socket.handler.impl.HeartBeatMessageHandler;
 import com.zhang.trace.master.agent.socket.handler.impl.RegistryResultMessageHandler;
-import com.zhang.trace.master.core.config.socket.request.SocketMessageType;
+import com.zhang.trace.master.core.socket.request.SocketMessageType;
 
 /**
  * server 向 agent 发送的消息处理接口

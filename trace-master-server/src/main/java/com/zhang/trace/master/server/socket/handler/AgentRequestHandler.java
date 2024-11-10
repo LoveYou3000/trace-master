@@ -1,10 +1,11 @@
 package com.zhang.trace.master.server.socket.handler;
 
-import com.zhang.trace.master.core.config.socket.request.SocketMessageType;
+import com.zhang.trace.master.core.socket.request.SocketMessageType;
 import com.zhang.trace.master.server.socket.handler.impl.FetchConfigRequestHandler;
 import com.zhang.trace.master.server.socket.handler.impl.HeartBeatRequestHandler;
 import com.zhang.trace.master.server.socket.handler.impl.RegisterRequestHandler;
 import com.zhang.trace.master.server.socket.handler.impl.UnRegisterRequestHandler;
+import com.zhang.trace.master.server.socket.handler.impl.UploadTracesRequestHandler;
 import org.springframework.web.socket.WebSocketSession;
 
 /**
@@ -45,6 +46,9 @@ public interface AgentRequestHandler<T> {
             }
             case FETCH_CONFIG -> {
                 return new FetchConfigRequestHandler();
+            }
+            case UPLOAD_TRACES -> {
+                return new UploadTracesRequestHandler();
             }
             default -> throw new RuntimeException("未适配的请求类型:" + agentMessageType);
         }

@@ -2,7 +2,7 @@ package com.zhang.trace.master.agent.socket.handler.impl;
 
 import com.zhang.trace.master.agent.socket.AgentSocketClient;
 import com.zhang.trace.master.agent.socket.handler.ServerMessageHandler;
-import com.zhang.trace.master.core.config.socket.request.domain.RegistryResultMessage;
+import com.zhang.trace.master.core.socket.request.domain.RegistryResultMessage;
 
 /**
  * 注册结果消息处理器

@@ -1,10 +1,10 @@
 package com.zhang.trace.master.server;
 
-import com.zhang.trace.master.core.config.socket.request.SocketMessage;
-import com.zhang.trace.master.core.config.socket.request.SocketMessageType;
-import com.zhang.trace.master.core.config.socket.request.domain.AgentEnableMessage;
-import com.zhang.trace.master.core.config.socket.request.domain.RegistryMessage;
-import com.zhang.trace.master.core.config.socket.request.domain.UnRegistryMessage;
+import com.zhang.trace.master.core.socket.request.SocketMessage;
+import com.zhang.trace.master.core.socket.request.SocketMessageType;
+import com.zhang.trace.master.core.socket.request.domain.AgentEnableMessage;
+import com.zhang.trace.master.core.socket.request.domain.RegistryMessage;
+import com.zhang.trace.master.core.socket.request.domain.UnRegistryMessage;
 import com.zhang.trace.master.server.domain.request.instance.ListRequest;
 import com.zhang.trace.master.server.domain.request.instance.UpdateStatusRequest;
 import com.zhang.trace.master.server.domain.response.base.ResultPage;

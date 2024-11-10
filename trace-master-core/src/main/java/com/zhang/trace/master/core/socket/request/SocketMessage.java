@@ -1,7 +1,7 @@
-package com.zhang.trace.master.core.config.socket.request;
+package com.zhang.trace.master.core.socket.request;
 
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
-import com.zhang.trace.master.core.config.socket.request.domain.BaseSocketMessage;
+import com.zhang.trace.master.core.socket.request.domain.BaseSocketMessage;
 
 /**
  * socket 发送的消息

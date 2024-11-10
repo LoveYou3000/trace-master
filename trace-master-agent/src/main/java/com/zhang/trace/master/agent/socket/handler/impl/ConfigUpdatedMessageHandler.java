@@ -4,7 +4,7 @@ import com.zhang.trace.master.agent.interceptor.context.TraceMasterContext;
 import com.zhang.trace.master.agent.socket.AgentSocketClient;
 import com.zhang.trace.master.agent.socket.handler.ServerMessageHandler;
 import com.zhang.trace.master.core.config.TraceMasterAgentConfig;
-import com.zhang.trace.master.core.config.socket.request.domain.ConfigUpdatedMessage;
+import com.zhang.trace.master.core.socket.request.domain.ConfigUpdatedMessage;
 
 /**
  * 配置已更新消息处理器

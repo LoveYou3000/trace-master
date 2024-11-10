@@ -1,4 +1,4 @@
-package com.zhang.trace.master.core.config.util;
+package com.zhang.trace.master.core.util;
 
 import lombok.NonNull;
 

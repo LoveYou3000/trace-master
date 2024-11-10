@@ -1,13 +1,14 @@
-package com.zhang.trace.master.core.config.socket.request;
+package com.zhang.trace.master.core.socket.request;
 
-import com.zhang.trace.master.core.config.socket.request.domain.AgentEnableMessage;
-import com.zhang.trace.master.core.config.socket.request.domain.BaseSocketMessage;
-import com.zhang.trace.master.core.config.socket.request.domain.ConfigUpdatedMessage;
-import com.zhang.trace.master.core.config.socket.request.domain.FetchConfigMessage;
-import com.zhang.trace.master.core.config.socket.request.domain.HeartBeatMessage;
-import com.zhang.trace.master.core.config.socket.request.domain.RegistryMessage;
-import com.zhang.trace.master.core.config.socket.request.domain.RegistryResultMessage;
-import com.zhang.trace.master.core.config.socket.request.domain.UnRegistryMessage;
+import com.zhang.trace.master.core.socket.request.domain.AgentEnableMessage;
+import com.zhang.trace.master.core.socket.request.domain.BaseSocketMessage;
+import com.zhang.trace.master.core.socket.request.domain.ConfigUpdatedMessage;
+import com.zhang.trace.master.core.socket.request.domain.FetchConfigMessage;
+import com.zhang.trace.master.core.socket.request.domain.HeartBeatMessage;
+import com.zhang.trace.master.core.socket.request.domain.RegistryMessage;
+import com.zhang.trace.master.core.socket.request.domain.RegistryResultMessage;
+import com.zhang.trace.master.core.socket.request.domain.UnRegistryMessage;
+import com.zhang.trace.master.core.socket.request.domain.UploadTracesMessage;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 
@@ -58,6 +59,11 @@ public enum SocketMessageType {
      * agent启用
      */
     AGENT_ENABLE(AgentEnableMessage.class),
+
+    /**
+     * 上送调用链路
+     */
+    UPLOAD_TRACES(UploadTracesMessage.class),
 
     ;
 
