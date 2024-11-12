@@ -18,12 +18,14 @@ public class UploadTracesMessage extends BaseSocketMessage {
 
     private Long traceId;
 
-    private TraceMessage rootTrace;
+    private List<TraceMessage> traces;
 
     @Data
     public static class TraceMessage {
 
         private Long id;
+
+        private Long parentId;
 
         private String className;
 

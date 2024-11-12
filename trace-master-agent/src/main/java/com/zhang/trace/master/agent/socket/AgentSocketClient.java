@@ -1,6 +1,5 @@
 package com.zhang.trace.master.agent.socket;
 
-import cn.hutool.core.lang.Pair;
 import cn.hutool.core.net.Ipv4Util;
 import cn.hutool.core.net.NetUtil;
 import cn.hutool.core.thread.ThreadUtil;
@@ -139,6 +138,7 @@ public class AgentSocketClient extends WebSocketClient {
         config.setExcludePackages(excludePackages);
         config.setMethodEntrances(methodEntrance);
 
+        log.info("获取到配置:{}", config);
         TraceMasterContext.setTraceMasterAgentConfig(config);
     }
 
@@ -146,28 +146,12 @@ public class AgentSocketClient extends WebSocketClient {
         UploadTracesMessage uploadTracesMessage = new UploadTracesMessage();
         uploadTracesMessage.setAppId(appId);
         uploadTracesMessage.setInstanceId(instanceId);
+        uploadTracesMessage.setTraceId(finishedSpans.get(0).context().traceId());
 
-        // build root trace
-        MockSpan rootSpan = finishedSpans.stream().filter(span -> 0 == span.parentId()).findFirst().orElseThrow();
-        UploadTracesMessage.TraceMessage rootTrace = buildTraceMessage(rootSpan);
-        buildChildTrace(rootSpan, rootTrace, finishedSpans);
-
-        uploadTracesMessage.setTraceId(rootSpan.context().traceId());
-        uploadTracesMessage.setRootTrace(rootTrace);
+        List<UploadTracesMessage.TraceMessage> traces = finishedSpans.stream().map(this::buildTraceMessage).toList();
+        uploadTracesMessage.setTraces(traces);
 
         send(uploadTracesMessage, SocketMessageType.UPLOAD_TRACES);
-    }
-
-    private void buildChildTrace(MockSpan rootSpan, UploadTracesMessage.TraceMessage rootTrace, List<MockSpan> finishedSpans) {
-        List<MockSpan> spans = finishedSpans.stream()
-                .filter(span -> rootSpan.context().spanId() == span.parentId())
-                .toList();
-        List<UploadTracesMessage.TraceMessage> children = spans.stream().map(span -> {
-            UploadTracesMessage.TraceMessage traceMessage = buildTraceMessage(span);
-            buildChildTrace(span, traceMessage, finishedSpans);
-            return traceMessage;
-        }).toList();
-        rootTrace.setChildren(children);
     }
 
     private UploadTracesMessage.TraceMessage buildTraceMessage(MockSpan span) {
@@ -185,6 +169,7 @@ public class AgentSocketClient extends WebSocketClient {
 
         UploadTracesMessage.TraceMessage traceMessage = new UploadTracesMessage.TraceMessage();
         traceMessage.setId(span.context().spanId());
+        traceMessage.setParentId(span.parentId());
         traceMessage.setClassName(tags.get("className").toString());
         traceMessage.setMethodName(span.operationName());
         traceMessage.setArgs(args);
