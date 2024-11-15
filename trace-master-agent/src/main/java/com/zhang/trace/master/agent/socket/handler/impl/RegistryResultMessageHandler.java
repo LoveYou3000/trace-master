@@ -20,6 +20,9 @@ public class RegistryResultMessageHandler implements ServerMessageHandler<Regist
         }
         session.setInstanceId(instanceId);
 
+        // 拉取配置
+        session.fetchConfig();
+
         // 向 server 发送心跳
         session.heartbeat();
     }

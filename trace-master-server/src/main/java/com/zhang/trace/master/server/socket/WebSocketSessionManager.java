@@ -162,6 +162,7 @@ public class WebSocketSessionManager {
      * @param serverMessage 要发送的消息实体类
      */
     public static void sendMessage(@NonNull WebSocketSession session, @NonNull SocketMessage<? extends BaseSocketMessage> serverMessage) {
+        log.info("发送消息，类型:{}，消息体:{}", serverMessage.type(), serverMessage.data());
         sendMessage(session, JacksonUtil.toJsonString(serverMessage));
     }
 

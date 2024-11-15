@@ -20,7 +20,6 @@ public class HeartBeatMessageHandler implements ServerMessageHandler<HeartBeatMe
 
     @Override
     public void handle(HeartBeatMessage heartBeatMessage, AgentSocketClient session) {
-        log.debug("收到心跳消息:{}", heartBeatMessage);
         if (!Objects.equals(heartBeatMessage.getPong(), PONG)) {
             throw new RuntimeException("wrong heartbeat data:" + heartBeatMessage.getPong());
         }

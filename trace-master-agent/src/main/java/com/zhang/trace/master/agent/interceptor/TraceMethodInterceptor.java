@@ -33,6 +33,10 @@ public class TraceMethodInterceptor {
         }
 
         TraceMasterAgentConfig config = TraceMasterContext.getTraceMasterAgentConfig();
+        // 配置未拉取回来，直接返回，不做任何处理
+        if (Objects.isNull(config)) {
+            return callable.call();
+        }
         // 类名及方法名不匹配，直接返回，不做任何处理
         String klzName = method.getDeclaringClass().getName();
         String methodName = method.getName();

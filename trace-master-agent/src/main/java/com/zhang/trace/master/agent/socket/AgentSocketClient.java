@@ -5,10 +5,10 @@ import cn.hutool.core.net.NetUtil;
 import cn.hutool.core.thread.ThreadUtil;
 import com.zhang.trace.master.agent.interceptor.context.TraceMasterContext;
 import com.zhang.trace.master.agent.socket.handler.ServerMessageHandler;
-import com.zhang.trace.master.core.config.TraceMasterAgentConfig;
 import com.zhang.trace.master.core.socket.request.SocketMessage;
 import com.zhang.trace.master.core.socket.request.SocketMessageType;
 import com.zhang.trace.master.core.socket.request.domain.BaseSocketMessage;
+import com.zhang.trace.master.core.socket.request.domain.FetchConfigMessage;
 import com.zhang.trace.master.core.socket.request.domain.HeartBeatMessage;
 import com.zhang.trace.master.core.socket.request.domain.RegistryMessage;
 import com.zhang.trace.master.core.socket.request.domain.UnRegistryMessage;
@@ -23,11 +23,9 @@ import org.java_websocket.handshake.ServerHandshake;
 import java.net.URI;
 import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.HashSet;
 import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
-import java.util.Set;
 import java.util.concurrent.TimeUnit;
 import java.util.stream.Collectors;
 
@@ -55,7 +53,6 @@ public class AgentSocketClient extends WebSocketClient {
     @Override
     public void onOpen(ServerHandshake serverHandshake) {
         register();
-        fetchConfig();
         Runtime.getRuntime().addShutdownHook(new Thread(() -> {
             unRegister();
             this.close();
@@ -65,6 +62,7 @@ public class AgentSocketClient extends WebSocketClient {
     @Override
     public void onMessage(String s) {
         SocketMessage<?> serverMessage = JacksonUtil.parseObj(s, SocketMessage.class);
+        log.info("收到消息，类型:{}，消息体:{}", serverMessage.type(), serverMessage.data());
         ServerMessageHandler.getServerRequestHandler(serverMessage.type()).handleMessage(serverMessage.data(), this);
     }
 
@@ -122,24 +120,11 @@ public class AgentSocketClient extends WebSocketClient {
     }
 
     public void fetchConfig() {
-        TraceMasterAgentConfig config = new TraceMasterAgentConfig();
+        FetchConfigMessage fetchConfigMessage = new FetchConfigMessage();
+        fetchConfigMessage.setAppId(appId);
+        fetchConfigMessage.setInstanceId(instanceId);
 
-        Set<String> includePackages = new HashSet<>();
-        includePackages.add("com.zhang.test.trace");
-        includePackages.add("com.ruoyi");
-
-        Set<String> excludePackages = new HashSet<>();
-
-        Set<String> methodEntrance = new HashSet<>();
-        methodEntrance.add("com.zhang.test.trace.runner.PreheatRunner#run");
-        methodEntrance.add("com.ruoyi.system.service.impl.SysConfigServiceImpl#init");
-
-        config.setIncludePackages(includePackages);
-        config.setExcludePackages(excludePackages);
-        config.setMethodEntrances(methodEntrance);
-
-        log.info("获取到配置:{}", config);
-        TraceMasterContext.setTraceMasterAgentConfig(config);
+        send(fetchConfigMessage, SocketMessageType.FETCH_CONFIG);
     }
 
     public void uploadFinishedSpans(List<MockSpan> finishedSpans) {

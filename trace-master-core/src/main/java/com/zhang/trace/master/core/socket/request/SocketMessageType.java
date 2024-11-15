@@ -51,6 +51,11 @@ public enum SocketMessageType {
     FETCH_CONFIG(FetchConfigMessage.class),
 
     /**
+     * 拉取配置信息结果
+     */
+    FETCH_CONFIG_RESULT(FetchConfigMessage.class),
+
+    /**
      * 配置已更新
      */
     CONFIG_UPDATED(ConfigUpdatedMessage.class),

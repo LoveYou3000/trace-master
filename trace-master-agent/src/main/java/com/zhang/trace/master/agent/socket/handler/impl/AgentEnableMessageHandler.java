@@ -17,7 +17,6 @@ public class AgentEnableMessageHandler implements ServerMessageHandler<AgentEnab
 
     @Override
     public void handle(AgentEnableMessage agentEnableMessage, AgentSocketClient session) {
-        log.info("设置全局开关为:{}", agentEnableMessage.getEnable());
         TraceMasterContext.setGlobalEnable(agentEnableMessage.getEnable());
     }
 

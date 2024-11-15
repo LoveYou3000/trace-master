@@ -54,7 +54,7 @@ public class ConfigService {
     }
 
     public TraceMasterAgentConfig getConfig(String appId) {
-        return configMap.putIfAbsent(appId, defaultConfig);
+        return configMap.computeIfAbsent(appId, k -> defaultConfig);
     }
 
 }
