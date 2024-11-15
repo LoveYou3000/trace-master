@@ -17,4 +17,6 @@ public class PageRequest {
 
     private String orderByColumn;
 
+    private String isAsc;
+
 }

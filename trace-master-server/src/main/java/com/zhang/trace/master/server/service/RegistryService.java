@@ -1,4 +1,4 @@
-package com.zhang.trace.master.server;
+package com.zhang.trace.master.server.service;
 
 import com.zhang.trace.master.core.socket.request.SocketMessage;
 import com.zhang.trace.master.core.socket.request.SocketMessageType;
@@ -10,6 +10,7 @@ import com.zhang.trace.master.server.domain.request.instance.UpdateStatusRequest
 import com.zhang.trace.master.server.domain.response.base.ResultPage;
 import com.zhang.trace.master.server.domain.response.instance.ListResponse;
 import com.zhang.trace.master.server.socket.WebSocketSessionManager;
+import com.zhang.trace.master.server.utils.PageUtil;
 import lombok.Getter;
 import org.springframework.beans.BeanUtils;
 import org.springframework.stereotype.Service;
@@ -92,15 +93,8 @@ public class RegistryService {
                     return resp;
                 })
                 .toList();
-        int startIdx = (listRequest.getCurrentPage() - 1) * listRequest.getPageSize();
-        int endIdx = Math.min(startIdx + listRequest.getPageSize(), totalList.size());
-        List<ListResponse> list = totalList.subList(startIdx, endIdx);
-        return ResultPage.<ListResponse>builder()
-                .total((long) totalList.size())
-                .currentPage(listRequest.getCurrentPage())
-                .pageSize(listRequest.getPageSize())
-                .list(list)
-                .build();
+
+        return PageUtil.page(totalList, listRequest);
     }
 
     /**
