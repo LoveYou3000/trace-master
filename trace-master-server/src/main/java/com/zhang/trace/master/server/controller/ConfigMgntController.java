@@ -40,4 +40,11 @@ public class ConfigMgntController {
                 .success(true).build();
     }
 
+    @PostMapping("updateDefaultConfig")
+    public Result<Void> updateDefaultConfig(@RequestBody UpdateRequest updateRequest) {
+        configService.updateDefaultConfig(updateRequest);
+        return Result.<Void>builder()
+                .success(true).build();
+    }
+
 }
