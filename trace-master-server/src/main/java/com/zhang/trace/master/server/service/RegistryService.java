@@ -1,5 +1,6 @@
 package com.zhang.trace.master.server.service;
 
+import com.zhang.trace.master.core.consts.RedisConstants;
 import com.zhang.trace.master.core.socket.request.SocketMessage;
 import com.zhang.trace.master.core.socket.request.SocketMessageType;
 import com.zhang.trace.master.core.socket.request.domain.AgentEnableMessage;
@@ -11,15 +12,16 @@ import com.zhang.trace.master.server.domain.response.base.ResultPage;
 import com.zhang.trace.master.server.domain.response.instance.ListResponse;
 import com.zhang.trace.master.server.socket.WebSocketSessionManager;
 import com.zhang.trace.master.server.utils.PageUtil;
-import lombok.Getter;
+import lombok.RequiredArgsConstructor;
 import org.springframework.beans.BeanUtils;
+import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.stereotype.Service;
 import org.springframework.util.StringUtils;
 
 import java.time.Instant;
+import java.util.Collection;
 import java.util.List;
 import java.util.Objects;
-import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.concurrent.atomic.AtomicInteger;
 
 /**
@@ -29,6 +31,7 @@ import java.util.concurrent.atomic.AtomicInteger;
  * @date 2024-11-10 12:14
  */
 @Service
+@RequiredArgsConstructor
 public class RegistryService {
 
     /**
@@ -36,11 +39,7 @@ public class RegistryService {
      */
     private final AtomicInteger registryId = new AtomicInteger(1);
 
-    /**
-     * 保存所有的注册信息
-     */
-    @Getter
-    private final List<RegistryMessage> registryMessages = new CopyOnWriteArrayList<>();
+    private final RedisTemplate<String, Object> redisTemplate;
 
     /**
      * 注册
@@ -52,7 +51,8 @@ public class RegistryService {
         registryMessage.setId(id);
         registryMessage.setRegistryTime(Instant.now().toEpochMilli());
 
-        registryMessages.add(registryMessage);
+        String hashKey = registryMessage.getAppId() + "_" + registryMessage.getInstanceId();
+        redisTemplate.opsForHash().put(RedisConstants.REGISTRY_LIST, hashKey, registryMessage);
     }
 
     /**
@@ -61,8 +61,8 @@ public class RegistryService {
      * @param unRegistryMessage 反注册的消息
      */
     public void unRegistry(UnRegistryMessage unRegistryMessage) {
-        registryMessages.removeIf(registryMessage -> Objects.equals(registryMessage.getAppId(), unRegistryMessage.getAppId()) &&
-                Objects.equals(registryMessage.getInstanceId(), unRegistryMessage.getInstanceId()));
+        String hashKey = unRegistryMessage.getAppId() + "_" + unRegistryMessage.getInstanceId();
+        redisTemplate.opsForHash().delete(RedisConstants.REGISTRY_LIST, hashKey);
     }
 
     /**
@@ -72,8 +72,10 @@ public class RegistryService {
      * @return 分页查询结果
      */
     public ResultPage<ListResponse> list(ListRequest listRequest) {
+        Collection<Object> registryMessages = redisTemplate.opsForHash().entries(RedisConstants.REGISTRY_LIST).values();
         List<ListResponse> totalList = registryMessages
                 .stream()
+                .map(r -> (RegistryMessage) r)
                 .filter(registryMessage -> {
                     if (StringUtils.hasLength(listRequest.getAppId())) {
                         return Objects.equals(registryMessage.getAppId(), listRequest.getAppId());
@@ -112,10 +114,10 @@ public class RegistryService {
 
         WebSocketSessionManager.sendMessage(updateStatusRequest.getAppId(), updateStatusRequest.getInstanceId(), socketMessage);
 
-        registryMessages.stream().filter(registryMessage -> {
-            return Objects.equals(registryMessage.getAppId(), updateStatusRequest.getAppId()) &&
-                    Objects.equals(registryMessage.getInstanceId(), updateStatusRequest.getInstanceId());
-        }).forEach(registryMessage -> registryMessage.setStatus(updateStatusRequest.getStatus()));
+        String hashKey = updateStatusRequest.getAppId() + "_" + updateStatusRequest.getInstanceId();
+        RegistryMessage registryMessage = (RegistryMessage) redisTemplate.opsForHash().get(RedisConstants.REGISTRY_LIST, hashKey);
+        registryMessage.setStatus(updateStatusRequest.getStatus());
+        redisTemplate.opsForHash().put(RedisConstants.REGISTRY_LIST, hashKey, registryMessage);
     }
 
 }
