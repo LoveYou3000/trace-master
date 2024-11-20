@@ -43,7 +43,8 @@ public class ConfigService {
                 .sorted((o1, o2) -> o2.getValue().getLastUpdate().compareTo(o1.getValue().getLastUpdate()))
                 .map(o -> {
                     ListResponse resp = new ListResponse();
-                    BeanUtils.copyProperties(o, resp);
+                    resp.setAppId(o.getKey());
+                    resp.setConfig(o.getValue());
                     return resp;
                 })
                 .toList();
