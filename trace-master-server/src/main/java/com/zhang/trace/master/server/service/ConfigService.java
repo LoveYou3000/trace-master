@@ -1,20 +1,24 @@
 package com.zhang.trace.master.server.service;
 
 import com.zhang.trace.master.core.config.TraceMasterAgentConfig;
+import com.zhang.trace.master.core.consts.RedisConstants;
 import com.zhang.trace.master.server.domain.request.config.ListRequest;
 import com.zhang.trace.master.server.domain.request.config.UpdateRequest;
 import com.zhang.trace.master.server.domain.response.base.ResultPage;
 import com.zhang.trace.master.server.domain.response.config.ListResponse;
 import com.zhang.trace.master.server.utils.PageUtil;
+import jakarta.annotation.PostConstruct;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.BeanUtils;
+import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.stereotype.Service;
 import org.springframework.util.StringUtils;
 
+import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
-import java.util.concurrent.ConcurrentHashMap;
+import java.util.Set;
 
 /**
  * agent 配置管理业务
@@ -26,11 +30,22 @@ import java.util.concurrent.ConcurrentHashMap;
 @RequiredArgsConstructor
 public class ConfigService {
 
-    private final Map<String, TraceMasterAgentConfig> configMap = new ConcurrentHashMap<>();
+    private static final String DEFAULT = "default";
 
-    private final TraceMasterAgentConfig defaultConfig;
+    private final RedisTemplate<String, Object> redisTemplate;
+
+    private TraceMasterAgentConfig defaultConfig;
+
+    @PostConstruct
+    public void init() {
+        if (!redisTemplate.opsForHash().hasKey(RedisConstants.CONFIG_LIST, DEFAULT)) {
+            redisTemplate.opsForHash().put(RedisConstants.CONFIG_LIST, DEFAULT, new TraceMasterAgentConfig());
+        }
+        defaultConfig = (TraceMasterAgentConfig) redisTemplate.opsForHash().get(RedisConstants.CONFIG_LIST, DEFAULT);
+    }
 
     public ResultPage<ListResponse> list(ListRequest listRequest) {
+        Map<Object, Object> configMap = redisTemplate.opsForHash().entries(RedisConstants.CONFIG_LIST);
         List<ListResponse> totalList = configMap
                 .entrySet()
                 .stream()
@@ -40,11 +55,11 @@ public class ConfigService {
                     }
                     return true;
                 })
-                .sorted((o1, o2) -> o2.getValue().getLastUpdate().compareTo(o1.getValue().getLastUpdate()))
+                .sorted((o1, o2) -> ((TraceMasterAgentConfig) o2.getValue()).getLastUpdate().compareTo(((TraceMasterAgentConfig) o1.getValue()).getLastUpdate()))
                 .map(o -> {
                     ListResponse resp = new ListResponse();
-                    resp.setAppId(o.getKey());
-                    resp.setConfig(o.getValue());
+                    resp.setAppId((String) o.getKey());
+                    resp.setConfig((TraceMasterAgentConfig) o.getValue());
                     return resp;
                 })
                 .toList();
@@ -53,15 +68,19 @@ public class ConfigService {
     }
 
     public void updateConfig(UpdateRequest updateRequest) {
-        configMap.put(updateRequest.getAppId(), updateRequest.getConfig());
+        redisTemplate.opsForHash().put(RedisConstants.CONFIG_LIST, updateRequest.getAppId(), updateRequest.getConfig());
     }
 
     public void updateDefaultConfig(UpdateRequest updateRequest) {
-        BeanUtils.copyProperties(updateRequest.getConfig(), defaultConfig);
+        defaultConfig = updateRequest.getConfig();
+        redisTemplate.opsForHash().put(RedisConstants.CONFIG_LIST, DEFAULT, defaultConfig);
     }
 
     public TraceMasterAgentConfig getConfig(String appId) {
-        return configMap.computeIfAbsent(appId, k -> defaultConfig);
+        if (!redisTemplate.opsForHash().hasKey(RedisConstants.CONFIG_LIST, appId)) {
+            redisTemplate.opsForHash().put(RedisConstants.CONFIG_LIST, appId, defaultConfig);
+        }
+        return (TraceMasterAgentConfig) redisTemplate.opsForHash().get(RedisConstants.CONFIG_LIST, appId);
     }
 
 }

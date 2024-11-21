@@ -16,4 +16,6 @@ public interface RedisConstants {
 
     String REGISTRY_LIST = TRACE_MASTER + SERVER + "reg_l";
 
+    String CONFIG_LIST = TRACE_MASTER + SERVER + "conf_l";
+
 }
