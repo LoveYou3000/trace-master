@@ -8,17 +8,15 @@ import com.zhang.trace.master.server.domain.response.base.ResultPage;
 import com.zhang.trace.master.server.domain.response.config.ListResponse;
 import com.zhang.trace.master.server.utils.PageUtil;
 import jakarta.annotation.PostConstruct;
+import lombok.Getter;
 import lombok.RequiredArgsConstructor;
-import org.springframework.beans.BeanUtils;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.stereotype.Service;
 import org.springframework.util.StringUtils;
 
-import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
-import java.util.Set;
 
 /**
  * agent 配置管理业务
@@ -30,18 +28,15 @@ import java.util.Set;
 @RequiredArgsConstructor
 public class ConfigService {
 
-    private static final String DEFAULT = "default";
-
     private final RedisTemplate<String, Object> redisTemplate;
 
+    @Getter
     private TraceMasterAgentConfig defaultConfig;
 
     @PostConstruct
     public void init() {
-        if (!redisTemplate.opsForHash().hasKey(RedisConstants.CONFIG_LIST, DEFAULT)) {
-            redisTemplate.opsForHash().put(RedisConstants.CONFIG_LIST, DEFAULT, new TraceMasterAgentConfig());
-        }
-        defaultConfig = (TraceMasterAgentConfig) redisTemplate.opsForHash().get(RedisConstants.CONFIG_LIST, DEFAULT);
+        redisTemplate.opsForValue().setIfAbsent(RedisConstants.CONFIG_DEFAULT, new TraceMasterAgentConfig());
+        this.defaultConfig = (TraceMasterAgentConfig) redisTemplate.opsForValue().get(RedisConstants.CONFIG_DEFAULT);
     }
 
     public ResultPage<ListResponse> list(ListRequest listRequest) {
@@ -73,7 +68,7 @@ public class ConfigService {
 
     public void updateDefaultConfig(UpdateRequest updateRequest) {
         defaultConfig = updateRequest.getConfig();
-        redisTemplate.opsForHash().put(RedisConstants.CONFIG_LIST, DEFAULT, defaultConfig);
+        redisTemplate.opsForValue().set(RedisConstants.CONFIG_DEFAULT, defaultConfig);
     }
 
     public TraceMasterAgentConfig getConfig(String appId) {

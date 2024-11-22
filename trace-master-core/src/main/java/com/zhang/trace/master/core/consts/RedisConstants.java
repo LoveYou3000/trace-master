@@ -18,4 +18,6 @@ public interface RedisConstants {
 
     String CONFIG_LIST = TRACE_MASTER + SERVER + "conf_l";
 
+    String CONFIG_DEFAULT = TRACE_MASTER + SERVER + "conf_default";
+
 }

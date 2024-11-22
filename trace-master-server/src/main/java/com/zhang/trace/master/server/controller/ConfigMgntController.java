@@ -4,6 +4,7 @@ import com.zhang.trace.master.server.domain.request.config.ListRequest;
 import com.zhang.trace.master.server.domain.request.config.UpdateRequest;
 import com.zhang.trace.master.server.domain.response.base.Result;
 import com.zhang.trace.master.server.domain.response.base.ResultTable;
+import com.zhang.trace.master.server.domain.response.config.DefaultConfigResponse;
 import com.zhang.trace.master.server.domain.response.config.ListResponse;
 import com.zhang.trace.master.server.service.ConfigService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -31,6 +32,15 @@ public class ConfigMgntController {
                 .success(true)
                 .data(configService.list(listRequest))
                 .build();
+    }
+
+    @PostMapping("defaultConfig")
+    public Result<DefaultConfigResponse> defaultConfig() {
+        DefaultConfigResponse defaultConfigResponse = new DefaultConfigResponse();
+        defaultConfigResponse.setDefaultConfig(configService.getDefaultConfig());
+        return Result.<DefaultConfigResponse>builder()
+                .success(true)
+                .data(defaultConfigResponse).build();
     }
 
     @PostMapping("update")
