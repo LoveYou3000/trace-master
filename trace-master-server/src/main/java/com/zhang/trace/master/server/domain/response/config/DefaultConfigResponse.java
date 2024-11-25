@@ -12,6 +12,8 @@ import lombok.Data;
 @Data
 public class DefaultConfigResponse {
 
+    private String appId;
+
     private TraceMasterAgentConfig defaultConfig;
 
 }

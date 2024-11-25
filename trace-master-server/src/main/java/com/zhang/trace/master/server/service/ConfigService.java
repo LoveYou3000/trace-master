@@ -17,6 +17,7 @@ import org.springframework.util.StringUtils;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
+import java.util.Set;
 
 /**
  * agent 配置管理业务
@@ -35,7 +36,11 @@ public class ConfigService {
 
     @PostConstruct
     public void init() {
-        redisTemplate.opsForValue().setIfAbsent(RedisConstants.CONFIG_DEFAULT, new TraceMasterAgentConfig());
+        TraceMasterAgentConfig initDefaultConfig = new TraceMasterAgentConfig();
+        initDefaultConfig.setIncludePackages(Set.of("com.psbc"));
+        initDefaultConfig.setExcludePackages(Set.of("java.util"));
+        initDefaultConfig.setMethodEntrances(Set.of("com.psbc.App#run"));
+        redisTemplate.opsForValue().setIfAbsent(RedisConstants.CONFIG_DEFAULT, initDefaultConfig);
         this.defaultConfig = (TraceMasterAgentConfig) redisTemplate.opsForValue().get(RedisConstants.CONFIG_DEFAULT);
     }
 
